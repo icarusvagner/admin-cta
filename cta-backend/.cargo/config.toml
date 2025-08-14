@@ -1,0 +1,69 @@
+# Cargo config file.
+# See: https://doc.rust-lang.org/cargo/reference/config.html
+
+[cargo-new]
+vcs = "none"
+
+# Environments variables set for all `cargo ...` commands.
+[env]
+
+# Scope down tracing, to filter out external lib tracing.
+RUST_LOG="web_server=debug,lib_core=debug,lib_auth=debug,lib_utils=debug,lib_web=debug"
+
+# -- Service Environment Variables
+# IMPORTANT:
+#   For cargo commands only.
+#   For deployed env, should be managed by container
+#   (e.g., Kubernetes).
+
+## -- Secrets
+# Keys and passwords below are for localhost dev ONLY.
+# e.g., "welcome" type of passwords.
+# i.e., Encryption not needed.
+
+# for server url
+SERVICE_URL="0.0.0.0:3000"
+
+
+## -- ConfigMap
+
+# This will be relative to Cargo.toml
+# In deployed images, probably use absolute path.
+SERVICE_WEB_FOLDER="apps/"
+
+## -- Static public folder that will hold the images and other files related to the frontend.
+SERVICE_PUBLIC_FOLDER="public/"
+
+## -- For email smtp
+# -- this is for hostinger email smtp
+HOSTINGER_SMTP = "smtp.hostinger.com"
+HOSTINGER_PORT = "465"
+HOSTINGER_USER = "info@cebutouradventures.com"
+HOSTINGER_PASS = "Castlebyte@2025_"
+
+# -- this is for ionos email smtp
+IONOS_SMTP = "smtp.ionos.com"
+IONOS_PORT = ""
+IONOS_USER = "info@lunaglobalmedial.com"
+IONOS_PASS = ""
+
+# -- this is for dev using gmail smtp
+GMAIL_SMTP_HOST = "smtp.gmail.com"
+GMAIL_SMTP_PORT = "587"
+GMAIL_SMTP_USER = "dev.castlebyte@gmail.com"
+GMAIL_SMTP_PASS = "mglgwiogtcndfkge "
+
+# --- Allow https domain
+DOMAIN_MAIN		= "https://cebutouradventures.com"
+DOMAIN_DEV		= "http://localhost:8000/"
+
+## -- For testing.
+SERVICE_PWD_KEY 				= "CKUGFOD9_2Qf6Pn3ZFRYgPYb8ht4vKqEG9PGMXTB7497bT0367DjoaD6ydFnEVaIRda0kKeBZVCT5Hb62m2sCA"
+SERVICE_TOKEN_KEY				= "9FoHBmkyxbgu_xFoQK7e0jz3RMNVJWgfvbVn712FBNH9LLaAWS3CS6Zpcg6RveiObvCUb6a2z-uAiLjhLh2igw"
+SERVICE_TOKEN_DURATION_SEC		= "1800" # 30 minutes
+
+DATABASE_URL		= "postgresql://castlebyte_dev:Dev_only.2025@localhost/cta_db"
+# DATABASE_URL		= "postgresql://akaza:Dev_only.2025@localhost/cta_db"
+DATABASE_URL_DEV	= "postgresql://neondb_owner:npg_8brmwHxut2Lj@ep-autumn-firefly-a8yo3pqj-pooler.eastus2.azure.neon.tech/cta_db?sslmode=require&channel_binding=require"
+PASSWORD_KEY		= "jBE2OTL5FwAYlgYosMDiasd77p1WLbItcQ-fwvb-F4OBpDDgQlBwShjn5W8zUmy4zwHLfLIEaY7XMbXYo7sOQw"
+

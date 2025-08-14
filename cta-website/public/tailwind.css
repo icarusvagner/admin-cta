@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  --arimo: "Arimo", sans-serif;
+  --quicksand: "Quicksand", sans-serif;
+
+  /* Color 01 */
+  --prussian-blue: #003049ff;
+  --fire-engine-red: #d62828ff;
+  --orange-wheel: #f77f00ff;
+  --xanthous: #fcbf49ff;
+  --vanilla: #eae2b7ff;
+
+  /* Color 02 */
+  --davys-gray: #595959ff;
+  --gray: #7f7f7fff;
+  --silver: #a5a5a5ff;
+  --silver-2: #ccccccff;
+  --white-smoke: #f2f2f2ff;
+}

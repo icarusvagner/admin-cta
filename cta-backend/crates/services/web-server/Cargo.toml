@@ -1,0 +1,38 @@
+[package]
+name = "web-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# --- Web
+axum = { version = "0.8", features = ["macros"] }
+derive_more = { workspace = true }
+# --- App libs
+lib-auth = { path = "../../libs/lib-auth/" }
+lib-core = { path = "../../libs/lib-core/" }
+lib-utils = { path = "../../libs/lib-utils/" }
+lib-web = { path = "../../libs/lib-web" }
+rpc-router = { workspace = true }
+# --- JSON
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_with = { workspace = true }
+strum_macros = "0.27"
+thiserror.workspace = true
+# -- Rpc
+time = { workspace = true }
+# --- Async
+tokio = { version = "1", features = ["full"] }
+tower-cookies = "0.11"
+tower-http = { version = "0.6", features = ["cors", "fs", "trace"] }
+# --- Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# --- Others
+uuid = { workspace = true }
+
+[dev-dependencies]
+httpc-test = "0.1"
+
+[lints]
+workspace = true

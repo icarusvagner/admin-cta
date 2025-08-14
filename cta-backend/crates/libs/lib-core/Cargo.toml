@@ -1,0 +1,36 @@
+[package]
+name = "lib-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+derive_more.workspace = true
+lib-auth = { path = "../../libs/lib-auth" }
+lib-query = { path = "../../libs/lib-query" }
+# -- libs
+lib-utils = { path = "../../libs/lib-utils" }
+# -- Feature: with-rpc
+rpc-router = { workspace = true, optional = true }
+sea-query.workspace = true
+sea-query-binder.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_with.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+# for tracing debugging for early dev
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid.workspace = true
+
+[features]
+with-rpc = ["rpc-router"]
+
+[lints]
+workspace = true
