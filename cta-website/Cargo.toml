@@ -15,44 +15,48 @@ console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1"
 
+base64 = "0.22"
+
+tracing = "0.1"
+tracing-subscriber-wasm = "0.1"
+tracing-subscriber = { version = "0.3", features= ["env-filter"] }
+
 leptos-use = { version = "0.16.0-beta2", features = ["storage", "use_event_listener", "on_click_outside", "use_window_focus", "use_intersection_observer"] }
 leptos_query = { version = "0.5", features = ["csr"] }
 
 # utils
 strum = { version = "0.25", features = ["derive", "strum_macros"] }
 strum_macros = "0.25"
+reqwasm = "0.5"
+gloo-timers = { version = "0.3", features = ["futures"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
 
 # icons
 icondata_core = "0.1.0"
 icondata = "0.6.0"
 phosphor-leptos = "0.8.0"
 leptos_icons = "0.7.0"
+dotenv = "0.15.0"
+gloo = { version = "0.11.0", features = ["file", "futures"] }
+serde-xml-rs = "0.8.1"
+csv = "1.3.1"
+thiserror = "2.0.14"
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = [ "Navigator", "HtmlAudioElement", "HtmlMediaElement", "HtmlVideoElement", "Performance", "Window", "TextTrack", "TextTrackMode", "TextTrackList", "MouseEvent", "PointerEvent", "Screen", "ScreenOrientation", "OrientationLockType", "Document", "File", "FileList", "DomParser", "SupportedType"] }
+chrono = "0.4.41"
+time = { version = "0.3.41", features = ["formatting", "parsing", "serde"] }
+ron = "0.10.1"
+toml = "0.9.5"
+
+[dependencies.tauri-sys]
+git = "https://github.com/opensourcecheemsburgers/tauri-sys"
+features = ["all"]
 
 [dev-dependencies]
 wasm-bindgen = "0.2"
 wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = [
-      "Navigator",
-    "HtmlAudioElement",
-    "HtmlMediaElement",
-    "HtmlVideoElement",
-    "Performance",
-    "Window",
-    "TextTrack",
-    "TextTrackMode",
-    "TextTrackList",
-    "MouseEvent",
-    "PointerEvent",
-    "Screen",
-    "ScreenOrientation",
-    "OrientationLockType",
-    "Document",
-    "File",
-    "FileList",
-    "DomParser",
-    "SupportedType",
-] }
-
+web-sys = { version = "0.3", features = [ "Navigator", "HtmlAudioElement", "HtmlMediaElement", "HtmlVideoElement", "Performance", "Window", "TextTrack", "TextTrackMode", "TextTrackList", "MouseEvent", "PointerEvent", "Screen", "ScreenOrientation", "OrientationLockType", "Document", "File", "FileList", "DomParser", "SupportedType"] }
 
 [profile.release]
 opt-level = 'z'

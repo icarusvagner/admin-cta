@@ -4,10 +4,13 @@ use leptos_router::{components::*, StaticSegment};
 
 // Modules
 mod components;
+mod config;
 mod context_provider;
+mod error;
 mod layouts;
 mod pages;
 mod types;
+mod utils;
 
 // Top-Level pages
 use crate::{

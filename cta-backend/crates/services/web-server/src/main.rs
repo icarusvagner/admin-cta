@@ -1,5 +1,3 @@
-#[allow(unused)]
-#[allow(dead_code)]
 use axum::http::HeaderValue;
 use axum::{
     http::{
