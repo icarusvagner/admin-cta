@@ -10,19 +10,48 @@ authors = ["icarusvagner <icarusvagner@gmail.com>"]
 leptos = { version = "0.8", features = ["csr", "nightly"] }
 leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8", features = ["nightly"] }
+leptos_dom = "0.8.5"
 console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1"
 
-# utils
-# strum = { version = "0.25", features = ["derive", "strum_macros"] }
-# strum_macros = "0.25"
+leptos-use = { version = "0.16.0-beta2", features = ["storage", "use_event_listener", "on_click_outside", "use_window_focus", "use_intersection_observer"] }
+leptos_query = { version = "0.5", features = ["csr"] }
 
+# utils
+strum = { version = "0.25", features = ["derive", "strum_macros"] }
+strum_macros = "0.25"
+
+# icons
+icondata_core = "0.1.0"
+icondata = "0.6.0"
+phosphor-leptos = "0.8.0"
+leptos_icons = "0.7.0"
 
 [dev-dependencies]
 wasm-bindgen = "0.2"
 wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = ["Document", "Window"] }
+web-sys = { version = "0.3", features = [
+      "Navigator",
+    "HtmlAudioElement",
+    "HtmlMediaElement",
+    "HtmlVideoElement",
+    "Performance",
+    "Window",
+    "TextTrack",
+    "TextTrackMode",
+    "TextTrackList",
+    "MouseEvent",
+    "PointerEvent",
+    "Screen",
+    "ScreenOrientation",
+    "OrientationLockType",
+    "Document",
+    "File",
+    "FileList",
+    "DomParser",
+    "SupportedType",
+] }
 
 
 [profile.release]

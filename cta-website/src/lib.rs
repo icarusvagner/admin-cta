@@ -1,13 +1,20 @@
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::{components::*, path};
+use leptos_router::{components::*, StaticSegment};
 
 // Modules
 mod components;
+mod context_provider;
+mod layouts;
 mod pages;
+mod types;
 
 // Top-Level pages
-use crate::pages::home::Home;
+use crate::{
+    context_provider::ConfigProvider,
+    layouts::main_layout::MainLayout,
+    pages::{home::Home, login::LoginPage, not_found::NotFound},
+};
 
 /// An app router which renders the homepage and handles 404's
 #[component]
@@ -16,19 +23,15 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Html attr:lang="en" attr:dir="ltr" attr:data-theme="light" />
-
-        // sets the document title
-        <Title text="Welcome to Leptos CSR" />
-
-        // injects metadata in the <head> of the page
-        <Meta charset="UTF-8" />
-        <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <Router>
-            <Routes fallback=|| view! { NotFound }>
-                <Route path=path!("/") view=Home />
-            </Routes>
-        </Router>
+        <ConfigProvider>
+            <Router>
+                <Routes fallback=|| view! { <NotFound /> }>
+                    <ParentRoute path=StaticSegment("/") view=MainLayout>
+                        <Route path=StaticSegment("") view=Home />
+                    </ParentRoute>
+                    <Route path=StaticSegment("login") view=LoginPage />
+                </Routes>
+            </Router>
+        </ConfigProvider>
     }
 }
