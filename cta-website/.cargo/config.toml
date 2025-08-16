@@ -1,0 +1,8 @@
+
+[env]
+RUST_LOG="cta_website=debug"
+
+
+REQUEST_DEV_URL		= "http://localhost:3000/api"
+REQUEST_PROD_URL	= "http://localhost:3000/api"
+REQUEST_TEST_URL	= "http://localhost:3000/test"

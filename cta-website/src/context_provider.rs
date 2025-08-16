@@ -7,19 +7,31 @@ use crate::types::theme::Themes;
 #[derive(Clone, Copy, Debug)]
 pub struct ConfigProvider {
     pub theme: RwSignal<String>,
+    logged_in: RwSignal<bool>,
 }
 
 impl ConfigProvider {
     pub fn new() -> Self {
         let (stored_theme, _, _) = use_local_storage::<String, JsonSerdeCodec>("theme");
+
         let theme = stored_theme.get();
+
         Self {
             theme: RwSignal::new(theme),
+            logged_in: RwSignal::new(true),
         }
     }
 
     pub fn expect_context() -> Self {
         expect_context()
+    }
+
+    pub fn logged_in(&self) -> bool {
+        self.logged_in.get()
+    }
+
+    pub fn set_logged_in(&self, state: bool) {
+        self.logged_in.set(state);
     }
 
     pub fn update_theme(&self, theme: Themes) {

@@ -490,6 +490,7 @@ dependencies = [
  "leptos_router",
  "log",
  "phosphor-leptos",
+ "regex",
  "reqwasm",
  "ron",
  "serde",

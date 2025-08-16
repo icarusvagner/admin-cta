@@ -64,10 +64,7 @@ pub fn SidebarMenu(#[prop(into)] view_margin: RwSignal<String>) -> AnyView {
                         let val_temp = val.clone();
                         view! {
                             <a
-                                href=format!(
-                                    "{}",
-                                    val_temp.clone().1.to_string().replace(" ", "-").to_lowercase(),
-                                )
+                                href=format!("{}", val_temp.clone().1.to_link())
                                 class="btn btn-ghost btn-soft"
                             >
                                 <div class="w-42 mx-auto flex items-center gap-2">
@@ -118,6 +115,18 @@ impl Display for SidebarMenus {
             SidebarMenus::PromoPackages => write!(f, "Promo Packages"),
             SidebarMenus::Itinerary => write!(f, "Itinerary"),
             SidebarMenus::Locations => write!(f, "Location"),
+        }
+    }
+}
+
+impl SidebarMenus {
+    fn to_link(&self) -> String {
+        match self {
+            SidebarMenus::Dashboard => "/".into(),
+            SidebarMenus::Packages => "/packages".into(),
+            SidebarMenus::PromoPackages => "/promo-packages".into(),
+            SidebarMenus::Itinerary => "/itinerary".into(),
+            SidebarMenus::Locations => "/location".into(),
         }
     }
 }

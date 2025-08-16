@@ -2,6 +2,8 @@ use gloo::utils::format::JsValueSerdeExt;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::JsValue;
 
+pub type Result<T> = core::result::Result<T, Error>;
+
 #[derive(Debug, Deserialize, Serialize, Clone, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizeErrors {
@@ -17,6 +19,7 @@ pub enum Error {
     DateTime,
     DynInto,
     ElementNotFound,
+    EmptyInputs,
     GlooFileRead(String),
     LangCode,
     Network(String),
@@ -62,6 +65,7 @@ impl std::fmt::Display for Error {
             Self::DateTime => write!(f, "Date time error."),
             Self::DynInto => write!(f, "Dynamic conversion error."),
             Self::ElementNotFound => write!(f, "Element not found error."),
+            Self::EmptyInputs => write!(f, "Empty inputs."),
             Self::GlooFileRead(error) => {
                 write!(f, "File Read Error: {error}")
             }

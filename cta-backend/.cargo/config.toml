@@ -62,8 +62,8 @@ SERVICE_PWD_KEY 				= "CKUGFOD9_2Qf6Pn3ZFRYgPYb8ht4vKqEG9PGMXTB7497bT0367DjoaD6y
 SERVICE_TOKEN_KEY				= "9FoHBmkyxbgu_xFoQK7e0jz3RMNVJWgfvbVn712FBNH9LLaAWS3CS6Zpcg6RveiObvCUb6a2z-uAiLjhLh2igw"
 SERVICE_TOKEN_DURATION_SEC		= "1800" # 30 minutes
 
-DATABASE_URL		= "postgresql://castlebyte_dev:Dev_only.2025@localhost/cta_db"
-# DATABASE_URL		= "postgresql://akaza:Dev_only.2025@localhost/cta_db"
+# DATABASE_URL		= "postgresql://castlebyte_dev:Dev_only.2025@localhost/cta_db"
+DATABASE_URL		= "postgresql://akaza:Dev_only.2025@localhost/cta_db"
 DATABASE_URL_DEV	= "postgresql://neondb_owner:npg_8brmwHxut2Lj@ep-autumn-firefly-a8yo3pqj-pooler.eastus2.azure.neon.tech/cta_db?sslmode=require&channel_binding=require"
 PASSWORD_KEY		= "jBE2OTL5FwAYlgYosMDiasd77p1WLbItcQ-fwvb-F4OBpDDgQlBwShjn5W8zUmy4zwHLfLIEaY7XMbXYo7sOQw"
 

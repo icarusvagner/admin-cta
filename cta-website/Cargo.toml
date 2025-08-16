@@ -21,7 +21,7 @@ tracing = "0.1"
 tracing-subscriber-wasm = "0.1"
 tracing-subscriber = { version = "0.3", features= ["env-filter"] }
 
-leptos-use = { version = "0.16.0-beta2", features = ["storage", "use_event_listener", "on_click_outside", "use_window_focus", "use_intersection_observer"] }
+leptos-use = { version = "0.16.0-beta2", features = ["storage", "use_event_listener", "on_click_outside", "use_window_focus", "use_intersection_observer", "use_cookie"] }
 leptos_query = { version = "0.5", features = ["csr"] }
 
 # utils
@@ -48,6 +48,7 @@ chrono = "0.4.41"
 time = { version = "0.3.41", features = ["formatting", "parsing", "serde"] }
 ron = "0.10.1"
 toml = "0.9.5"
+regex = "1.11.1"
 
 [dependencies.tauri-sys]
 git = "https://github.com/opensourcecheemsburgers/tauri-sys"

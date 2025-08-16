@@ -1,7 +1,9 @@
 use serde::{Serialize, de::DeserializeOwned};
 use web_sys::FormData;
 
-use crate::{config::web_config, error::{AuthorizeErrors, Error}};
+use crate::{web_config, error::{AuthorizeErrors, Error}};
+
+const REQUEST_DEV_URL: &str = env!("REQUEST_DEV_URL");
 
 pub async fn request<B, T>(
 	method: reqwasm::http::Method,
@@ -17,7 +19,7 @@ where
 		reqwasm::http::Method::POST | reqwasm::http::Method::PUT
 	);
 
-	let url = format!("{}{}", &web_config().DEV_REQ_URL, url);
+	let url = format!("{}{}", &REQUEST_DEV_URL, url);
 
 	let mut req = reqwasm::http::Request::new(&url)
 		.method(method)

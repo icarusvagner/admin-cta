@@ -46,6 +46,8 @@ async fn main() -> Result<()> {
     let cors_layer = CorsLayer::new()
         .allow_origin([
             "http://127.0.0.1:1350".parse::<HeaderValue>().unwrap(),
+            "http://0.0.0.0:1350".parse::<HeaderValue>().unwrap(),
+            "http://localhost:1350".parse::<HeaderValue>().unwrap(),
             // "https://cebutouradventures.com"
             //     .parse::<HeaderValue>()
             //     .unwrap(),

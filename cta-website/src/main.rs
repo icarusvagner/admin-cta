@@ -2,6 +2,8 @@ use cta_website::App;
 use leptos::prelude::*;
 
 fn main() {
+    dotenv::dotenv().ok();
+
     tracing_subscriber::fmt()
         .without_time() // For early local development.
         .with_target(false)
