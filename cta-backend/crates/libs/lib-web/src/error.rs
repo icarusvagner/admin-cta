@@ -40,6 +40,10 @@ pub enum Error {
     #[from]
     CtxExt(middleware::mw_auth::CtxExtError),
 
+    // -- AuthUser Extractor Error
+    #[from]
+    AuthUserExt(middleware::mw_auth::AuthUserExtError),
+
     // -- Extractors
     ReqStampNotInReqExt,
 

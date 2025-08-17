@@ -1,24 +1,40 @@
-use leptos::{context::Provider, prelude::*, server::codee::string::JsonSerdeCodec};
+use leptos::{
+    context::Provider,
+    prelude::*,
+    server::codee::string::{FromToStringCodec, JsonSerdeCodec},
+};
 use leptos_meta::*;
 use leptos_use::storage::use_local_storage;
 
 use crate::types::theme::Themes;
 
+#[derive(Debug, Clone, Default)]
+pub struct Tokens {
+    pub access_token: String,
+    pub refresh_token: String,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct ConfigProvider {
     pub theme: RwSignal<String>,
-    logged_in: RwSignal<bool>,
+    auth_token: RwSignal<Tokens>,
 }
 
 impl ConfigProvider {
     pub fn new() -> Self {
         let (stored_theme, _, _) = use_local_storage::<String, JsonSerdeCodec>("theme");
+        let (access_token, _, _) = use_local_storage::<String, FromToStringCodec>("access-token");
+        let (refresh_token, _, _) = use_local_storage::<String, FromToStringCodec>("refresh-token");
 
         let theme = stored_theme.get();
+        let tokens = Tokens {
+            access_token: access_token.get(),
+            refresh_token: refresh_token.get(),
+        };
 
         Self {
             theme: RwSignal::new(theme),
-            logged_in: RwSignal::new(true),
+            auth_token: RwSignal::new(tokens),
         }
     }
 
@@ -27,11 +43,16 @@ impl ConfigProvider {
     }
 
     pub fn logged_in(&self) -> bool {
-        self.logged_in.get()
+        !self.auth_token.get().access_token.is_empty()
+            && !self.auth_token.get().refresh_token.is_empty()
     }
 
-    pub fn set_logged_in(&self, state: bool) {
-        self.logged_in.set(state);
+    pub fn access_token(&self) -> String {
+        self.auth_token.get().access_token.clone()
+    }
+
+    pub fn set_tokens(&mut self, tokens: Tokens) {
+        self.auth_token.set(tokens);
     }
 
     pub fn update_theme(&self, theme: Themes) {

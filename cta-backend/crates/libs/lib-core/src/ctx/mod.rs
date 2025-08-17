@@ -8,6 +8,17 @@ pub struct Ctx {
     pub user_id: i64,
 }
 
+#[derive(Debug, Clone)]
+pub struct AuthUser {
+    pub uname: String,
+}
+
+impl AuthUser {
+    pub fn u_name(&self) -> String {
+        self.uname.clone()
+    }
+}
+
 impl Ctx {
     pub fn root_ctx() -> Self {
         Ctx { user_id: 0 }

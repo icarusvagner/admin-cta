@@ -1,9 +1,43 @@
+use std::sync::RwLock;
+
+use gloo::storage::{LocalStorage, Storage};
 use serde::{Serialize, de::DeserializeOwned};
 use web_sys::FormData;
+use lazy_static::lazy_static;
 
 use crate::{web_config, error::{AuthorizeErrors, Error}};
 
 const REQUEST_DEV_URL: &str = env!("REQUEST_DEV_URL");
+const TOKEN_ACCESS: &str = "access-token";
+const TOKEN_REFESH: &str = "refresh-token";
+
+lazy_static!{
+	pub static ref ACCESS_TOKEN: RwLock<Option<String>> = {
+		if let Ok(token) = LocalStorage::get(TOKEN_ACCESS) {
+			RwLock::new(Some(token))
+		} else {
+			RwLock::new(None)
+		}
+	};
+
+	pub static ref REFRESH_TOKEN: RwLock<Option<String>> = {
+		if let Ok(token) = LocalStorage::get(TOKEN_REFESH) {
+			RwLock::new(Some(token))
+		} else {
+			RwLock::new(None)
+		}
+	};
+}
+
+fn get_access() -> Option<String> {
+	let token_lock = ACCESS_TOKEN.read().unwrap();
+	token_lock.clone()
+}
+
+fn get_refresh() -> Option<String> {
+	let token_lock = REFRESH_TOKEN.read().unwrap();
+	token_lock.clone()
+}
 
 pub async fn request<B, T>(
 	method: reqwasm::http::Method,
@@ -24,6 +58,10 @@ where
 	let mut req = reqwasm::http::Request::new(&url)
 		.method(method)
 		.header("Content-Type", "application/json");
+
+	if let Some(token) = get_access() {
+		req = req.header("Authorization", format!("Bearer {}", token).as_ref());
+	}
 
 	if allow_body {
 		let body_json = serde_json::to_string(&body).map_err(|ex| {
@@ -90,7 +128,7 @@ where
 					Err(Error::SerdeJson("Unauthorized Error 401".to_string()))
 				}
 			}
-			403 => Err(Error::Network("Forbidden request".into())),
+			403 => Err(Error::Forbidden),
 			404 => {
 				let data: Result<AuthorizeErrors, _> =
 					serde_json::from_str(&error_txt);
@@ -114,6 +152,7 @@ where
 	}
 }
 
+#[allow(dead_code)]
 pub async fn request_post<B, T>(url: String, body: B) -> Result<T, Error>
 where
 	T: DeserializeOwned + 'static + std::fmt::Debug,
@@ -122,6 +161,32 @@ where
 	request(reqwasm::http::Method::POST, url, body).await
 }
 
+#[allow(dead_code)]
+pub async fn request_delete<T>(url: String) -> Result<T, Error>
+where
+	T: DeserializeOwned + 'static + std::fmt::Debug
+{
+	request(reqwasm::http::Method::DELETE, url, ()).await
+}
+
+#[allow(dead_code)]
+pub async fn request_get<T>(url: String) -> Result<T, Error>
+where
+	T: DeserializeOwned + 'static + std::fmt::Debug
+{
+	request(reqwasm::http::Method::GET, url, ()).await
+}
+
+#[allow(dead_code)]
+pub async fn request_put<B, T>(url: String, body: B) -> Result<T, Error>
+where
+	T: DeserializeOwned + 'static + std::fmt::Debug,
+	B: Serialize + std::fmt::Debug
+{
+	request(reqwasm::http::Method::PUT, url, body).await
+}
+
+#[allow(dead_code)]
 pub async fn request_form_post<T>(
 	url: String,
 	form_data: FormData,

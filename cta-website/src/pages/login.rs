@@ -1,7 +1,7 @@
 use leptos::{ev, prelude::*, task::spawn_local};
 use leptos_router::hooks::use_navigate;
 
-use crate::{context_provider::ConfigProvider, error::{Error, Result}, server::api_login_req, types::request_types::{LoginPayload, LoginReturn}};
+use crate::{context_provider::{ConfigProvider, Tokens}, error::{Error, Result}, server::auth::api_login_req, types::request_types::{LoginPayload, LoginReturn}};
 
 #[derive(Default, Clone, Debug)]
 struct LoginField {
@@ -29,8 +29,8 @@ async fn send_login_api(username: String, pwd: String) -> Result<LoginReturn> {
 pub fn LoginPage() -> AnyView {
     let form_input = RwSignal::new(LoginField::default());
     let result_err = RwSignal::new(String::new());
-    let config_context = ConfigProvider::expect_context();
-        let navigate = use_navigate();
+    let mut config_context = ConfigProvider::expect_context();
+    let navigate = use_navigate();
 
     let submit_form = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
@@ -39,8 +39,13 @@ pub fn LoginPage() -> AnyView {
         spawn_local(async move {
             match send_login_api(form_input.get().username, form_input.get().password).await {
                 Ok(res) => {
-                    if res.result.success {
-                        config_context.set_logged_in(true);
+                    let result = res.result;
+                    if result.success {
+                        let tokens = Tokens {
+                            access_token: result.access_token,
+                            refresh_token: result.refresh_token
+                        };
+                        config_context.set_tokens(tokens);
                         navigate("/", Default::default());
                     }
                 },

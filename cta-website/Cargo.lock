@@ -481,6 +481,7 @@ dependencies = [
  "gloo-timers 0.3.0",
  "icondata",
  "icondata_core",
+ "lazy_static",
  "leptos 0.8.6",
  "leptos-use",
  "leptos_dom 0.8.5",

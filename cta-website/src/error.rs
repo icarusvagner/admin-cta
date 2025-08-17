@@ -11,6 +11,7 @@ pub struct AuthorizeErrors {
     pub status: Option<u32>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
     BrowserStorage(String),
@@ -20,6 +21,7 @@ pub enum Error {
     DynInto,
     ElementNotFound,
     EmptyInputs,
+    Forbidden,
     GlooFileRead(String),
     LangCode,
     Network(String),
@@ -46,6 +48,12 @@ pub enum Error {
     Xml(String),
 }
 
+impl PartialEq for Error {
+    fn eq(&self, other: &Self) -> bool {
+        matches!(self, other)
+    }
+}
+
 impl From<JsValue> for Error {
     fn from(value: JsValue) -> Self {
         Self::Websys(JsValueSerdeExt::into_serde(&value).unwrap_or_default())
@@ -66,6 +74,7 @@ impl std::fmt::Display for Error {
             Self::DynInto => write!(f, "Dynamic conversion error."),
             Self::ElementNotFound => write!(f, "Element not found error."),
             Self::EmptyInputs => write!(f, "Empty inputs."),
+            Self::Forbidden => write!(f, "Forbidden request"),
             Self::GlooFileRead(error) => {
                 write!(f, "File Read Error: {error}")
             }

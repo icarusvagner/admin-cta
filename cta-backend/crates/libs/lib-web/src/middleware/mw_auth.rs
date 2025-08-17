@@ -2,12 +2,13 @@ use crate::error::{Error, Result};
 use crate::utils::token::{set_token_cookie, AUTH_TOKEN};
 use axum::body::Body;
 use axum::extract::{FromRequestParts, State};
+use axum::http::header::AUTHORIZATION;
 use axum::http::request::Parts;
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::Response;
 use lib_auth::token::{validate_web_token, Token};
-use lib_core::ctx::Ctx;
+use lib_core::ctx::{AuthUser, Ctx};
 use lib_core::model::admin::{AdminBmc, AdminForAuth};
 use lib_core::model::ModelManager;
 use serde::Serialize;
@@ -102,6 +103,7 @@ type CtxExtResult = core::result::Result<CtxW, CtxExtError>;
 
 #[derive(Clone, Serialize, Debug)]
 pub enum CtxExtError {
+    TokenNotInHeader,
     TokenNotInCookie,
     TokenWrongFormat,
 
@@ -112,5 +114,70 @@ pub enum CtxExtError {
 
     CtxNotInRequestExt,
     CtxCreateFail(String),
+}
+// endregion: --- Ctx Extractor Result/Error
+
+pub async fn mw_auth_resolver(
+    State(mm): State<ModelManager>,
+    mut req: Request<Body>,
+    next: Next,
+) -> Response {
+    todo!()
+}
+
+// region: --- Token extractor
+
+#[derive(Debug, Clone)]
+pub struct AuthUserW(pub AuthUser);
+
+impl<S: Send + Sync> FromRequestParts<S> for AuthUserW {
+    type Rejection = Error;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        _: &S,
+    ) -> std::result::Result<Self, Self::Rejection> {
+        debug!("{:<12} - AuthUserW", "EXTRACTOR");
+
+        let auth_token = parts
+            .headers
+            .get(AUTHORIZATION)
+            .ok_or(Error::AuthUserExt(AuthUserExtError::TokenNotInHeader))?;
+
+        let auth_str = auth_token
+            .to_str()
+            .map_err(|_| Error::AuthUserExt(AuthUserExtError::Unauthorize))?;
+
+        if let Some(("Bearer", token)) = auth_str.split_once(' ') {
+            
+        }
+
+        parts
+            .extensions
+            .get::<AuthUserExtResult>()
+            .ok_or(Error::AuthUserExt(AuthUserExtError::TokenNotInRequestExt))?
+            .clone()
+            .map_err(Error::AuthUserExt)
+    }
+}
+
+// endregion: --- Token extractor
+
+
+// region:    --- AuthUserExt Extractor Result/Error
+type AuthUserExtResult = core::result::Result<AuthUserW, AuthUserExtError>;
+
+#[derive(Clone, Serialize, Debug)]
+pub enum AuthUserExtError {
+    TokenNotInHeader,
+    TokenWrongFormat,
+
+    UserNotFound,
+    ModelAccessError(String),
+    FailValidate,
+    CannotSetTokens,
+    Unauthorize,
+
+    TokenNotInRequestExt,
 }
 // endregion: --- Ctx Extractor Result/Error
