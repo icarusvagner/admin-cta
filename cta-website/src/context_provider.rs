@@ -1,8 +1,4 @@
-use leptos::{
-    context::Provider,
-    prelude::*,
-    server::codee::string::{FromToStringCodec, JsonSerdeCodec},
-};
+use leptos::{context::Provider, prelude::*, server::codee::string::JsonSerdeCodec};
 use leptos_meta::*;
 use leptos_use::storage::use_local_storage;
 
@@ -10,8 +6,7 @@ use crate::types::theme::Themes;
 
 #[derive(Debug, Clone, Default)]
 pub struct Tokens {
-    pub access_token: String,
-    pub refresh_token: String,
+    pub auth_token: String,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -23,18 +18,12 @@ pub struct ConfigProvider {
 impl ConfigProvider {
     pub fn new() -> Self {
         let (stored_theme, _, _) = use_local_storage::<String, JsonSerdeCodec>("theme");
-        let (access_token, _, _) = use_local_storage::<String, FromToStringCodec>("access-token");
-        let (refresh_token, _, _) = use_local_storage::<String, FromToStringCodec>("refresh-token");
 
         let theme = stored_theme.get();
-        let tokens = Tokens {
-            access_token: access_token.get(),
-            refresh_token: refresh_token.get(),
-        };
 
         Self {
             theme: RwSignal::new(theme),
-            auth_token: RwSignal::new(tokens),
+            auth_token: RwSignal::new(Tokens::default()),
         }
     }
 
@@ -43,16 +32,16 @@ impl ConfigProvider {
     }
 
     pub fn logged_in(&self) -> bool {
-        !self.auth_token.get().access_token.is_empty()
-            && !self.auth_token.get().refresh_token.is_empty()
+        !self.auth_token.get().auth_token.is_empty()
     }
 
-    pub fn access_token(&self) -> String {
-        self.auth_token.get().access_token.clone()
+    pub fn auth_token(&self) -> String {
+        self.auth_token.get().auth_token.clone()
     }
 
-    pub fn set_tokens(&mut self, tokens: Tokens) {
-        self.auth_token.set(tokens);
+    pub fn set_token(&mut self, auth_token: String) {
+        let token = Tokens { auth_token };
+        self.auth_token.update(|va| *va = token);
     }
 
     pub fn update_theme(&self, theme: Themes) {

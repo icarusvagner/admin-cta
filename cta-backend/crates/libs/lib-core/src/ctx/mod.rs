@@ -14,6 +14,22 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
+    pub fn root_ctx() -> Self {
+        AuthUser {
+            uname: String::new(),
+        }
+    }
+
+    pub fn new(uname: String) -> Result<Self> {
+        if uname.is_empty() {
+            Err(Error::AuthUserCannotCreateNewRootUser)
+        } else {
+            Ok(Self { uname })
+        }
+    }
+}
+
+impl AuthUser {
     pub fn u_name(&self) -> String {
         self.uname.clone()
     }

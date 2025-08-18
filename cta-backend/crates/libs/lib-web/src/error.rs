@@ -101,6 +101,7 @@ impl Error {
 
             // -- Auth
             CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
+            AuthUserExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
             // -- Model
             Model(model::Error::EntityNotFound { entity, id }) => (

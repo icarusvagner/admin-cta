@@ -1,7 +1,8 @@
 pub use crate::error::ClientError;
 pub use crate::error::{Error, Result};
 use lib_auth::token::generate_web_token;
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::cookie::SameSite;
+use tower_cookies::{cookie::time::Duration, Cookie, Cookies};
 use uuid::Uuid;
 
 // endregion: --- Modules
@@ -13,6 +14,9 @@ pub(crate) fn set_token_cookie(cookies: &Cookies, user: &str, salt: Uuid) -> Res
 
     let mut cookie = Cookie::new(AUTH_TOKEN, token.to_string());
     cookie.set_http_only(true);
+    cookie.set_secure(true);
+    cookie.set_same_site(SameSite::None);
+    cookie.set_max_age(Some(Duration::hours(3)));
     cookie.set_path("/");
 
     cookies.add(cookie);

@@ -103,6 +103,8 @@ type CtxExtResult = core::result::Result<CtxW, CtxExtError>;
 
 #[derive(Clone, Serialize, Debug)]
 pub enum CtxExtError {
+    Unauthorized,
+
     TokenNotInHeader,
     TokenNotInCookie,
     TokenWrongFormat,
@@ -116,13 +118,66 @@ pub enum CtxExtError {
     CtxCreateFail(String),
 }
 // endregion: --- Ctx Extractor Result/Error
+pub async fn mw_auth_ctx_require(
+    auth_ctx: Result<AuthUserW>,
+    req: Request<Body>,
+    next: Next,
+) -> Result<Response> {
+    debug!("{:<12} - mw_auth_ctx_require - {auth_ctx:?}", "MIDDLEWARE");
+
+    auth_ctx?;
+
+    Ok(next.run(req).await)
+}
 
 pub async fn mw_auth_resolver(
     State(mm): State<ModelManager>,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
-    todo!()
+    debug!("{:<12} - mw_auth_resolver", "MIDDLEWARE");
+
+    let auth_ext_result = auth_resolver(mm, &req).await;
+
+    if auth_ext_result.is_err()
+        && !matches!(auth_ext_result, Err(AuthUserExtError::TokenNotInHeader))
+    {
+        req.headers_mut().remove(AUTHORIZATION);
+    }
+
+    req.extensions_mut().insert(auth_ext_result);
+
+    next.run(req).await
+}
+
+async fn auth_resolver(mm: ModelManager, req: &Request<Body>) -> AuthUserExtResult {
+    let auth_token = req
+        .headers()
+        .get(AUTHORIZATION)
+        .ok_or(AuthUserExtError::TokenNotInHeader)?;
+
+    let auth_str = auth_token
+        .to_str()
+        .map_err(|_| AuthUserExtError::Unauthorized)?;
+
+    let Some(("Bearer", token)) = auth_str.split_once(' ') else {
+        Err(AuthUserExtError::TokenWrongFormat)?
+    };
+
+    let token: Token = token
+        .parse()
+        .map_err(|_| AuthUserExtError::TokenWrongFormat)?;
+
+    let user: AdminForAuth = AdminBmc::first_by_uname(&Ctx::root_ctx(), &mm, &token.ident)
+        .await
+        .map_err(|ex| AuthUserExtError::ModelAccessError(ex.to_string()))?
+        .ok_or(AuthUserExtError::UserNotFound)?;
+
+    validate_web_token(&token, user.token_salt).map_err(|_| AuthUserExtError::FailValidate)?;
+
+    AuthUser::new(user.uname)
+        .map(AuthUserW)
+        .map_err(|ex| AuthUserExtError::AuthUserCtxCreateFail(ex.to_string()))
 }
 
 // region: --- Token extractor
@@ -133,24 +188,8 @@ pub struct AuthUserW(pub AuthUser);
 impl<S: Send + Sync> FromRequestParts<S> for AuthUserW {
     type Rejection = Error;
 
-    async fn from_request_parts(
-        parts: &mut Parts,
-        _: &S,
-    ) -> std::result::Result<Self, Self::Rejection> {
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
         debug!("{:<12} - AuthUserW", "EXTRACTOR");
-
-        let auth_token = parts
-            .headers
-            .get(AUTHORIZATION)
-            .ok_or(Error::AuthUserExt(AuthUserExtError::TokenNotInHeader))?;
-
-        let auth_str = auth_token
-            .to_str()
-            .map_err(|_| Error::AuthUserExt(AuthUserExtError::Unauthorize))?;
-
-        if let Some(("Bearer", token)) = auth_str.split_once(' ') {
-            
-        }
 
         parts
             .extensions
@@ -162,7 +201,6 @@ impl<S: Send + Sync> FromRequestParts<S> for AuthUserW {
 }
 
 // endregion: --- Token extractor
-
 
 // region:    --- AuthUserExt Extractor Result/Error
 type AuthUserExtResult = core::result::Result<AuthUserW, AuthUserExtError>;
@@ -176,8 +214,11 @@ pub enum AuthUserExtError {
     ModelAccessError(String),
     FailValidate,
     CannotSetTokens,
-    Unauthorize,
+    Unauthorized,
 
     TokenNotInRequestExt,
+
+    AuthUserContextNotInRequestExt,
+    AuthUserCtxCreateFail(String),
 }
 // endregion: --- Ctx Extractor Result/Error

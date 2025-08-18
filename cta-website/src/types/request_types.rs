@@ -13,7 +13,5 @@ pub struct LoginReturn {
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Clone, Default)]
 pub struct ResultReturn {
-    pub access_token: String,
-    pub refresh_token: String,
     pub success: bool,
 }

@@ -2,14 +2,13 @@ use std::sync::RwLock;
 
 use gloo::storage::{LocalStorage, Storage};
 use serde::{Serialize, de::DeserializeOwned};
-use web_sys::FormData;
+use web_sys::{FormData, RequestCredentials};
 use lazy_static::lazy_static;
 
 use crate::{web_config, error::{AuthorizeErrors, Error}};
 
 const REQUEST_DEV_URL: &str = env!("REQUEST_DEV_URL");
-const TOKEN_ACCESS: &str = "access-token";
-const TOKEN_REFESH: &str = "refresh-token";
+const TOKEN_ACCESS: &str = "auth-token";
 
 lazy_static!{
 	pub static ref ACCESS_TOKEN: RwLock<Option<String>> = {
@@ -20,22 +19,10 @@ lazy_static!{
 		}
 	};
 
-	pub static ref REFRESH_TOKEN: RwLock<Option<String>> = {
-		if let Ok(token) = LocalStorage::get(TOKEN_REFESH) {
-			RwLock::new(Some(token))
-		} else {
-			RwLock::new(None)
-		}
-	};
 }
 
 fn get_access() -> Option<String> {
 	let token_lock = ACCESS_TOKEN.read().unwrap();
-	token_lock.clone()
-}
-
-fn get_refresh() -> Option<String> {
-	let token_lock = REFRESH_TOKEN.read().unwrap();
 	token_lock.clone()
 }
 
@@ -57,6 +44,7 @@ where
 
 	let mut req = reqwasm::http::Request::new(&url)
 		.method(method)
+		.credentials(RequestCredentials::Include)
 		.header("Content-Type", "application/json");
 
 	if let Some(token) = get_access() {

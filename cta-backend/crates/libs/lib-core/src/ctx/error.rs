@@ -7,4 +7,6 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     #[error("Context cannot new root context")]
     CtxCannotNewRootCtx,
+    #[error("Auth User Context cannot new root user")]
+    AuthUserCannotCreateNewRootUser,
 }

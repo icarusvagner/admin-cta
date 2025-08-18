@@ -9,12 +9,10 @@ use axum::{
     Json, Router,
 };
 use lib_core::model::ModelManager;
+use lib_web::middleware::mw_auth::mw_ctx_resolver;
+use lib_web::middleware::mw_res_map::mw_reponse_map;
 use lib_web::{
-    middleware::{
-        mw_auth::{mw_ctx_require, mw_ctx_resolver},
-        mw_req_stamp::mw_req_stamp_resolver,
-        mw_res_map::mw_reponse_map,
-    },
+    middleware::{mw_auth::mw_ctx_require, mw_req_stamp::mw_req_stamp_resolver},
     routes::route_static,
 };
 use serde_json::{json, Value};
@@ -62,7 +60,7 @@ async fn main() -> Result<()> {
             Method::DELETE,
             Method::OPTIONS,
         ])
-        // .allow_credentials(true)
+        .allow_credentials(true)
         .allow_headers([CONTENT_TYPE, ACCESS_CONTROL_ALLOW_ORIGIN, ACCEPT]);
 
     let routes_apis = Router::new()
