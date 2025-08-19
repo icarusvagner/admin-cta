@@ -10,6 +10,13 @@ use lib_core::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 
+pub async fn api_get_location(
+    State(mm): State<ModelManager>,
+    Json(id): Json<i64>,
+) -> Result<Json<Value>> {
+    todo!()
+}
+
 pub async fn api_create_location(
     State(mm): State<ModelManager>,
     Json(payload): Json<CreateLocationPayload>,

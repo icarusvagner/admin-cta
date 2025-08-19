@@ -1,6 +1,10 @@
+use modql::filter::ListOptions;
+use serde::{de::DeserializeOwned, Deserialize};
+use serde_with::{serde_as, OneOrMany};
 use store::{dbx::Dbx, new_db_pool};
 
 pub mod admin;
+pub mod base;
 pub mod book;
 pub mod error;
 pub mod general;
@@ -33,4 +37,15 @@ impl ModelManager {
     pub fn dbx(&self) -> &Dbx {
         &self.dbx
     }
+}
+
+#[serde_as]
+#[derive(Deserialize, Default)]
+pub struct ParamsList<F>
+where
+    F: DeserializeOwned,
+{
+    #[serde_as(deserialize_as = "Option<OneOrMany<_>>")]
+    pub filters: Option<Vec<F>>,
+    pub list_options: Option<ListOptions>,
 }

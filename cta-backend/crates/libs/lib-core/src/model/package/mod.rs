@@ -1,8 +1,10 @@
 mod package_crud;
 
+use modql::field::Fields;
 pub use package_crud::*;
 use sea_query::Iden;
 use serde::{Deserialize, Serialize};
+use sqlx::prelude::FromRow;
 
 #[derive(Debug, Clone, sqlx::Type, derive_more::Display, Deserialize, Serialize)]
 #[sqlx(type_name = "optional_flag")]
@@ -187,4 +189,16 @@ pub struct GuestForCreate {
     pub email: String,
     pub phone_number: String,
     pub country: String,
+}
+
+// ----
+
+#[derive(Clone, Fields, FromRow, Debug, Serialize)]
+pub struct Location {
+    pub id: i64,
+    pub name: String,
+    pub city: String,
+    pub province: String,
+    pub category: String,
+    pub description: String,
 }

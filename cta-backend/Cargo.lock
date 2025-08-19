@@ -1517,6 +1517,7 @@ dependencies = [
  "lib-auth",
  "lib-query",
  "lib-utils",
+ "modql",
  "rpc-router",
  "sea-query",
  "sea-query-binder",
@@ -1825,6 +1826,30 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "modql"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4226d7e0d2a99687ed0eda5f33f2c9095bdf74869652eab73d075a9f981ecfd"
+dependencies = [
+ "modql-macros",
+ "sea-query",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "modql-macros"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64cb2ed7c4062a6219c5144317219a5b2668f413f40a52757b9481346817ac86"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sea-query",
+ "syn",
 ]
 
 [[package]]

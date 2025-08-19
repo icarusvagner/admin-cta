@@ -9,6 +9,7 @@ doctest = false
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 derive_more.workspace = true
+modql.workspace = true
 lib-auth = { path = "../../libs/lib-auth" }
 lib-query = { path = "../../libs/lib-query" }
 # -- libs

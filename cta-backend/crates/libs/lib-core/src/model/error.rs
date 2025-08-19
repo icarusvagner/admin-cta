@@ -102,6 +102,16 @@ pub enum Error {
     // General CID and MID
     #[error("Updating cid and mid failed - entity: {entity}, gen_id: {gen_id}")]
     CannotUpdateCidMid { entity: String, gen_id: i64 },
+
+    // -- Externals
+    #[error("Modql Into Sea Error")]
+    ModqlIntoSea(#[serde_as(as = "DisplayFromStr")] modql::filter::IntoSeaError),
+}
+
+impl From<modql::filter::IntoSeaError> for Error {
+    fn from(value: modql::filter::IntoSeaError) -> Self {
+        Error::ModqlIntoSea(value)
+    }
 }
 
 impl Error {
