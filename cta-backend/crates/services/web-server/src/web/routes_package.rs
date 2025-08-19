@@ -1,12 +1,12 @@
 use axum::{routing::post, Router};
 use lib_core::model::ModelManager;
-use lib_web::handlers::handlers_package;
+use lib_web::handlers::{handlers_location, handlers_package};
 
 pub fn routes(mm: ModelManager) -> Router {
     Router::new()
         .route(
             "/package/create/location",
-            post(handlers_package::api_create_location),
+            post(handlers_location::api_create_location),
         )
         .route(
             "/package/create/package",

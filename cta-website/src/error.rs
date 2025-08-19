@@ -21,6 +21,7 @@ pub enum Error {
     DynInto,
     ElementNotFound,
     EmptyInputs,
+    FailedToCreate(String),
     Forbidden,
     GlooFileRead(String),
     LangCode,
@@ -29,6 +30,7 @@ pub enum Error {
     NoAudioFormat,
     NoFileSelected,
     NoLegacyFormat,
+    NoReturn,
     NoThumbnails,
     NoVideoFormat,
     NoVideoQuality,
@@ -75,6 +77,7 @@ impl std::fmt::Display for Error {
             Self::ElementNotFound => write!(f, "Element not found error."),
             Self::EmptyInputs => write!(f, "Empty inputs."),
             Self::Forbidden => write!(f, "Forbidden request"),
+            Self::FailedToCreate(err) => write!(f, "{err}"),
             Self::GlooFileRead(error) => {
                 write!(f, "File Read Error: {error}")
             }
@@ -88,6 +91,7 @@ impl std::fmt::Display for Error {
             }
             Self::NoFileSelected => write!(f, "No file selected."),
             Self::NoLegacyFormat => write!(f, "No legacy format available."),
+            Self::NoReturn => write!(f, "No return"),
             Self::NoThumbnails => write!(f, "Error: No thumbnails available."),
             Self::NoVideoFormat => {
                 write!(f, "Error: No video formats available.")

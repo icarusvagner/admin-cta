@@ -1,6 +1,5 @@
-use leptos::{ev, prelude::*, server::codee::string::FromToStringCodec, task::spawn_local};
-use leptos_router::hooks::use_navigate;
-use leptos_use::use_cookie;
+use leptos::{ev, prelude::*, task::spawn_local};
+use leptos_router::{hooks::use_navigate, location::State};
 
 use crate::{context_provider::ConfigProvider, error::{Error, Result}, server::auth::api_login_req, types::request_types::{LoginPayload, LoginReturn}};
 
@@ -30,24 +29,21 @@ async fn send_login_api(username: String, pwd: String) -> Result<LoginReturn> {
 pub fn LoginPage() -> AnyView {
     let form_input = RwSignal::new(LoginField::default());
     let result_err = RwSignal::new(String::new());
-    let navigate = use_navigate();
     let mut config_context = ConfigProvider::expect_context();
+    let navigate = use_navigate();
 
     let submit_form = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
-        let navigate = navigate.clone();
+        let form_data = move || form_input.get();
+        let nav = navigate.clone();
 
-        if !form_input.get().username.is_empty() && !form_input.get().password.is_empty() {
+        if !form_data().username.is_empty() && !form_data().password.is_empty() {
         spawn_local(async move {
-            match send_login_api(form_input.get().username, form_input.get().password).await {
+            match send_login_api(form_data().username, form_data().password).await {
                 Ok(res) => {
                     if res.result.success {
-                        let (auth_token, _) =
-                            use_cookie::<String, FromToStringCodec>("auth-token");
-                        if let Some(val) = auth_token.get() {
-                            config_context.set_token(val);
-                            navigate("/", Default::default());
-                        }
+                    	config_context.is_logged_in();
+                    	nav("/", leptos_router::NavigateOptions { resolve: true, replace: true, scroll: true, state: State::default() });
                     } else {
                         result_err.set("Invalid username or password".to_string());
                     }
@@ -67,6 +63,8 @@ pub fn LoginPage() -> AnyView {
 		<section class="flex flex-col justify-center items-center min-h-screen">
 			<form
 				on:submit=submit_form
+				id="submit_form"
+				name="submit_form"
 				class="p-10 mx-auto space-y-6 rounded border w-xl border-base-100 bg-base-200"
 			>
 				<div class="flex gap-5 justify-between items-center">
@@ -79,6 +77,7 @@ pub fn LoginPage() -> AnyView {
 						"Signin to your CTA admin account."
 					</h1>
 				</div>
+
 				<div class="flex flex-col gap-0.5">
 					<label class="floating-label">
 						<input
@@ -92,6 +91,7 @@ pub fn LoginPage() -> AnyView {
 							type="text"
 							placeholder="Username *"
 							id="username"
+							name="username"
 							class="w-full validator input input-lg"
 							required
 							pattern=r#"^(?=.{3,16}$)[a-zA-Z0-9_]+$"#
@@ -129,6 +129,8 @@ pub fn LoginPage() -> AnyView {
 								form_input.set(current);
 							}
 							type="password"
+							id="password"
+							name="password"
 							class="w-full validator input input-lg"
 							required
 							placeholder="Password *"

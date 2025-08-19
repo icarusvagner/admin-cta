@@ -34,9 +34,24 @@ pub fn App() -> impl IntoView {
             <Router>
                 <Routes fallback=|| view! { <NotFound /> }>
                     <HomeRoutes />
-                    <Route path=StaticSegment("login") view=LoginPage />
+                    <RouteLogin />
                 </Routes>
             </Router>
         </ConfigProvider>
     }
+}
+
+#[component]
+fn RouteLogin() -> impl leptos_router::MatchNestedRoutes + Clone {
+    let config_context = ConfigProvider::expect_context();
+
+    view! {
+        <ProtectedRoute
+            condition=move || Some(!config_context.logged_in())
+            redirect_path=move || "/"
+            path=StaticSegment("login")
+            view=LoginPage
+        />
+    }
+    .into_inner()
 }

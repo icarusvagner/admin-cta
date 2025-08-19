@@ -490,6 +490,7 @@ dependencies = [
  "leptos_query",
  "leptos_router",
  "log",
+ "mockd",
  "phosphor-leptos",
  "regex",
  "reqwasm",
@@ -2228,6 +2229,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
+name = "mockd"
+version = "0.4.50"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "274141121ec1dbc954742c89dd8537998117679f66320d0b0dd32ea498028c7e"
+dependencies = [
+ "chrono",
+ "simplerand",
+]
+
+[[package]]
 name = "next_tuple"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3081,6 +3092,15 @@ name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
+
+[[package]]
+name = "simplerand"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e111daec97c913e764c730b11de670f36adfc9ef87c791ee8999ecc3ded8f644"
+dependencies = [
+ "lazy_static",
+]
 
 [[package]]
 name = "slab"

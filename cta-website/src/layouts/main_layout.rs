@@ -8,7 +8,7 @@ pub fn MainLayout() -> AnyView {
     let view_margin = RwSignal::new(String::from("ml-64"));
 
     view! {
-        <section class="min-h-screen flex bg-base-200">
+        <section class="flex min-h-screen bg-base-200">
             // <!-- Sidebar -->
             <SidebarMenu view_margin />
 
@@ -23,7 +23,7 @@ pub fn MainLayout() -> AnyView {
                 <NavbarMenu />
 
                 // <!-- Scrollable Content -->
-                <main class="flex-1 mt-12 p-3 overflow-y-auto">
+                <main class="overflow-y-auto flex-1 p-3 mt-12">
                     <Outlet />
                 </main>
             </div>

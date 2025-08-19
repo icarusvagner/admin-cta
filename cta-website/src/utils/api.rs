@@ -1,30 +1,26 @@
-use std::sync::RwLock;
 
-use gloo::storage::{LocalStorage, Storage};
 use serde::{Serialize, de::DeserializeOwned};
-use web_sys::{FormData, RequestCredentials};
-use lazy_static::lazy_static;
+use web_sys::{FormData};
 
 use crate::{web_config, error::{AuthorizeErrors, Error}};
 
 const REQUEST_DEV_URL: &str = env!("REQUEST_DEV_URL");
-const TOKEN_ACCESS: &str = "auth-token";
+// const TOKEN_ACCESS: &str = "auth-token";
 
-lazy_static!{
-	pub static ref ACCESS_TOKEN: RwLock<Option<String>> = {
-		if let Ok(token) = LocalStorage::get(TOKEN_ACCESS) {
-			RwLock::new(Some(token))
-		} else {
-			RwLock::new(None)
-		}
-	};
+// lazy_static!{
+// 	pub static ref ACCESS_TOKEN: RwLock<Option<String>> = {
+// 		if let Ok(token) = LocalStorage::get(TOKEN_ACCESS) {
+// 			RwLock::new(Some(token))
+// 		} else {
+// 			RwLock::new(None)
+// 		}
+// 	};
+// }
 
-}
-
-fn get_access() -> Option<String> {
-	let token_lock = ACCESS_TOKEN.read().unwrap();
-	token_lock.clone()
-}
+// fn get_access() -> Option<String> {
+// 	let token_lock = ACCESS_TOKEN.read().unwrap();
+// 	token_lock.clone()
+// }
 
 pub async fn request<B, T>(
 	method: reqwasm::http::Method,
@@ -44,12 +40,8 @@ where
 
 	let mut req = reqwasm::http::Request::new(&url)
 		.method(method)
-		.credentials(RequestCredentials::Include)
+		.credentials(reqwasm::http::RequestCredentials::Include)
 		.header("Content-Type", "application/json");
-
-	if let Some(token) = get_access() {
-		req = req.header("Authorization", format!("Bearer {}", token).as_ref());
-	}
 
 	if allow_body {
 		let body_json = serde_json::to_string(&body).map_err(|ex| {

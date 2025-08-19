@@ -2,7 +2,9 @@ use leptos::prelude::*;
 use leptos_router::{components::*, StaticSegment};
 
 use crate::{
-    context_provider::ConfigProvider, layouts::main_layout::MainLayout, pages::home::Home,
+    context_provider::ConfigProvider,
+    layouts::main_layout::MainLayout,
+    pages::{home::Home, locations::LocationPage},
 };
 
 #[component]
@@ -24,5 +26,9 @@ pub fn HomeRoutes() -> impl leptos_router::MatchNestedRoutes + Clone {
 
 #[component(transparent)]
 fn AppRoutes() -> impl leptos_router::MatchNestedRoutes + Clone {
-    view! { <Route path=StaticSegment("") view=Home /> }.into_inner()
+    view! {
+        <Route path=StaticSegment("") view=Home />
+        <Route path=StaticSegment("location") view=LocationPage />
+    }
+    .into_inner()
 }
