@@ -49,7 +49,7 @@ impl PackgeBmc {
         Ok(entity)
     }
 
-    pub async fn get_locations<E, F>(
+    pub async fn list_locations<E, F>(
         ctx: &Ctx,
         mm: &ModelManager,
         filter: Option<F>,

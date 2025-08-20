@@ -1,4 +1,4 @@
-use leptos::{prelude::*, task::spawn_local};
+use leptos::{either::Either, prelude::*, task::spawn_local};
 
 use crate::{error::{Error, Result}, server::location::api_create_location, types::request_types::{CreateLocationPayload, WithIdReturn}};
 
@@ -19,22 +19,26 @@ async fn send_create_location(data: CreateLocationField) -> Result<WithIdReturn>
 pub fn LocationCreate() -> AnyView {
 	let location_form = RwSignal::new(CreateLocationField::default());
 	let result_err =RwSignal::new(String::new());
+	let btn_state = RwSignal::new(false);
 
 	let submit_create = move |_| {
 		let form_data = move || location_form.get();
+		btn_state.set(true);
 
 		if !form_data().name.is_empty() && !form_data().city.is_empty() && !form_data().province.is_empty() && !form_data().category.is_empty() && !form_data().description.is_empty() {
-		spawn_local(async move {
-			match send_create_location(form_data()).await {
-				Ok(res) => {
-					leptos::logging::log!("Created {}", res.result.id);
-				}
-				Err(err) => {
-					result_err.set(err.to_string());
-				}
+			spawn_local(async move {
+				match send_create_location(form_data()).await {
+					Ok(res) => {
+						leptos::logging::log!("Created {}", res.result.id);
+						btn_state.set(false);
+					}
+					Err(err) => {
+						result_err.set(err.to_string());
+						btn_state.set(false);
+					}
 				
-			}
-		});
+				}
+			});
 		}
 	};
 
@@ -124,8 +128,20 @@ pub fn LocationCreate() -> AnyView {
 				type="button"
 				class="w-full text-lg btn btn-primary btn-soft"
 				on:click=submit_create
+				disabled=move || btn_state.get()
 			>
-				"Create Location"
+				{move || {
+					if !btn_state.get() {
+						Either::Left(view! { <span>"Create Location"</span> })
+					} else {
+						Either::Right(
+							view! {
+								<span class="loading loading-spinner"></span>
+								"Loading"
+							},
+						)
+					}
+				}}
 			</button>
 		</div>
 	}

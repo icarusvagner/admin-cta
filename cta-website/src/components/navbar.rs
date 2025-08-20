@@ -1,4 +1,4 @@
-use leptos::{prelude::*, reactive::spawn_local};
+use leptos::{either::Either, prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 use phosphor_leptos::{Icon, GEAR, MAGNIFYING_GLASS, SIGN_OUT, USER};
 
@@ -21,20 +21,24 @@ pub fn NavbarMenu() -> AnyView {
 	let result_err = RwSignal::new(String::new());
 	let navigate = use_navigate();
 	let mut context_config = ConfigProvider::expect_context();
+	let btn_state = RwSignal::new(false);
 
 	let log_out = move |_| {
 		let nav = navigate.clone();
+		btn_state.set(true);
 		
 		spawn_local(async move {
 			match send_logoff_api(true).await {
 				Ok(res) => {
 					if res.result.logged_off {
+						btn_state.set(false);
 						context_config.logout();
 						nav("/login", Default::default());
 					}
 				},
 				Err(ex) => {
 					result_err.set(ex.to_string());
+					btn_state.set(false);
 				}
 			}
 		});
@@ -79,9 +83,29 @@ pub fn NavbarMenu() -> AnyView {
 							</a>
 						</li>
 						<li>
-							<button class="btn btn-ghost" on:click=log_out>
-								<Icon icon=SIGN_OUT attr:class="h-5 w-5" />
-								<span>"Logout"</span>
+							<button
+								class="btn btn-ghost"
+								on:click=log_out
+								disabled=move || btn_state.get()
+							>
+								{move || {
+									if !btn_state.get() {
+										Either::Left(
+											view! {
+												<Icon icon=SIGN_OUT attr:class="h-5 w-5" />
+												<span>"Logout"</span>
+											},
+										)
+									} else {
+										Either::Right(
+
+											view! {
+												<span class="loading loading-spinner"></span>
+												"Loading"
+											},
+										)
+									}
+								}}
 							</button>
 						</li>
 					</ul>

@@ -1,12 +1,32 @@
 use modql::SIden;
-use sea_query::{IntoIden, TableRef};
+use sea_query::{Iden, IntoIden, TableRef};
 
 mod crud_fns;
+mod macro_utils;
+mod utils;
 
 pub use crud_fns::*;
 
 const LIST_LIMIT_DEFAULT: i64 = 1000;
 const LIST_LIMIT_MAX: i64 = 5000;
+
+// region:    --- SeaQuery Idens
+
+#[derive(Iden)]
+pub enum CommonIden {
+    Id,
+    OwnerId,
+}
+
+#[derive(Iden)]
+pub enum TimestampIden {
+    Cid,
+    Ctime,
+    Mid,
+    Mtime,
+}
+
+// endregion: --- SeaQuery Idens
 
 pub trait DbBmc {
     const TABLE: &'static str;

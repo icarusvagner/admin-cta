@@ -10,10 +10,12 @@ doctest = false
 chrono = { version = "0.4", features = ["serde"] }
 derive_more.workspace = true
 modql.workspace = true
-lib-auth = { path = "../../libs/lib-auth" }
-lib-query = { path = "../../libs/lib-query" }
+
 # -- libs
 lib-utils = { path = "../../libs/lib-utils" }
+lib-auth = { path = "../../libs/lib-auth" }
+lib-query = { path = "../../libs/lib-query" }
+
 # -- Feature: with-rpc
 rpc-router = { workspace = true, optional = true }
 sea-query.workspace = true

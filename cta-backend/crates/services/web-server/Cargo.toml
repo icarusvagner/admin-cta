@@ -7,11 +7,14 @@ edition = "2021"
 # --- Web
 axum = { version = "0.8", features = ["macros"] }
 derive_more = { workspace = true }
+
 # --- App libs
 lib-auth = { path = "../../libs/lib-auth/" }
 lib-core = { path = "../../libs/lib-core/" }
 lib-utils = { path = "../../libs/lib-utils/" }
 lib-web = { path = "../../libs/lib-web" }
+lib-rpc-core = { path = "../../libs/lib-rpc-core" }
+
 rpc-router = { workspace = true }
 # --- JSON
 serde = { workspace = true }

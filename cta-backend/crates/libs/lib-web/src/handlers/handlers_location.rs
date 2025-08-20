@@ -1,9 +1,12 @@
 use crate::error::{Error, Result};
-use axum::{extract::State, Json};
+use axum::{
+    extract::{Path, State},
+    Json,
+};
 use lib_core::{
     ctx::Ctx,
     model::{
-        package::{self, LocationForCreate},
+        package::{self, Location, LocationForCreate},
         ModelManager,
     },
 };
@@ -12,9 +15,24 @@ use serde_json::{json, Value};
 
 pub async fn api_get_location(
     State(mm): State<ModelManager>,
-    Json(id): Json<i64>,
+    Path(id): Path<i64>,
 ) -> Result<Json<Value>> {
-    todo!()
+    let ctx = Ctx::root_ctx();
+    let location = package::PackgeBmc::get_location_by_id::<Location>(&ctx, &mm, id)
+        .await
+        .map_err(|ex| Error::FailToGetData {
+            title: "Failed to get one location".to_string(),
+            reason: ex.to_string(),
+        })?;
+
+    let body = Json(json!({
+        "result" : {
+            "success": true,
+            "data": location
+        }
+    }));
+
+    Ok(body)
 }
 
 pub async fn api_create_location(

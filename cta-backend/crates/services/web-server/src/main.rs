@@ -26,7 +26,7 @@ mod config;
 mod error;
 mod web;
 
-use crate::web::routes_package;
+use crate::web::{routes_location, routes_package};
 
 pub use self::error::{Error, Result};
 use config::web_config;
@@ -66,6 +66,7 @@ async fn main() -> Result<()> {
     let routes_apis = Router::new()
         .merge(routes_admin::routes(mm.clone()))
         .merge(routes_package::routes(mm.clone()))
+        .merge(routes_location::routes(mm.clone()))
         .route_layer(middleware::from_fn(mw_ctx_require));
 
     let app = Router::new()

@@ -50,3 +50,24 @@ pub struct CreateLocationPayload {
     pub category: String,
     pub description: String,
 }
+
+#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Clone, Default)]
+pub struct LocationReturn {
+    pub result: LocationResult,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Default)]
+pub struct LocationResult {
+    pub success: bool,
+    pub data: OneLocation,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Default)]
+pub struct OneLocation {
+    pub id: i64,
+    pub name: String,
+    pub city: String,
+    pub province: String,
+    pub category: String,
+    pub description: String,
+}

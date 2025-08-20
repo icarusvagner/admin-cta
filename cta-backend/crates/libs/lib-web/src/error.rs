@@ -35,6 +35,10 @@ pub enum Error {
         title: String,
         reason: String,
     },
+    FailToGetData {
+        title: String,
+        reason: String,
+    },
 
     // -- CtxExtError
     #[from]
@@ -120,6 +124,13 @@ impl Error {
             UpdatePackageFailed { title, reason } => (
                 StatusCode::BAD_REQUEST,
                 ClientError::FAILED_UPDATE {
+                    title: title.to_string(),
+                    reason: reason.to_string(),
+                },
+            ),
+            FailToGetData { title, reason } => (
+                StatusCode::BAD_REQUEST,
+                ClientError::NOT_FOUND {
                     title: title.to_string(),
                     reason: reason.to_string(),
                 },

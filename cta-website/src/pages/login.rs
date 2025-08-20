@@ -1,4 +1,4 @@
-use leptos::{ev, prelude::*, task::spawn_local};
+use leptos::{either::Either, ev, prelude::*, task::spawn_local};
 use leptos_router::{hooks::use_navigate, location::State};
 
 use crate::{context_provider::ConfigProvider, error::{Error, Result}, server::auth::api_login_req, types::request_types::{LoginPayload, LoginReturn}};
@@ -31,31 +31,37 @@ pub fn LoginPage() -> AnyView {
     let result_err = RwSignal::new(String::new());
     let mut config_context = ConfigProvider::expect_context();
     let navigate = use_navigate();
+    let btn_state = RwSignal::new(false);
 
     let submit_form = move |ev: ev::SubmitEvent| {
         ev.prevent_default();
         let form_data = move || form_input.get();
         let nav = navigate.clone();
+        btn_state.set(true);
 
         if !form_data().username.is_empty() && !form_data().password.is_empty() {
-        spawn_local(async move {
-            match send_login_api(form_data().username, form_data().password).await {
-                Ok(res) => {
-                    if res.result.success {
-                    	config_context.is_logged_in();
-                    	nav("/", leptos_router::NavigateOptions { resolve: true, replace: true, scroll: true, state: State::default() });
-                    } else {
-                        result_err.set("Invalid username or password".to_string());
-                    }
-                },
-                Err(ex) => {
-                    leptos::logging::log!("Something went wrong: {}", ex.to_string());
-                    result_err.set(ex.to_string());
-                }
-            }
-        });
+	        spawn_local(async move {
+	            match send_login_api(form_data().username, form_data().password).await {
+	                Ok(res) => {
+	                    if res.result.success {
+				            btn_state.set(false);
+	                    	config_context.is_logged_in();
+	                    	nav("/", leptos_router::NavigateOptions { resolve: true, replace: true, scroll: true, state: State::default() });
+	                    } else {
+	                        result_err.set("Invalid username or password".to_string());
+				            btn_state.set(false);
+	                    }
+	                },
+	                Err(ex) => {
+	                    leptos::logging::log!("Something went wrong: {}", ex.to_string());
+	                    result_err.set(ex.to_string());
+			            btn_state.set(false);
+	                }
+	            }
+	        });
         } else {
             result_err.set("Invalid inputs".to_string());
+            btn_state.set(false);
         }
     };
 
@@ -162,8 +168,20 @@ pub fn LoginPage() -> AnyView {
 				<button
 					type="submit"
 					class="w-full text-xl font-semibold tracking-wide btn btn-primary"
+					disabled=move || btn_state.get()
 				>
-					"Submit"
+					{move || {
+						if !btn_state.get() {
+							Either::Left(view! { <span>"Submit"</span> })
+						} else {
+							Either::Right(
+								view! {
+									<span class="loading loading-spinner"></span>
+									"Loading"
+								},
+							)
+						}
+					}}
 				</button>
 			</form>
 		</section>

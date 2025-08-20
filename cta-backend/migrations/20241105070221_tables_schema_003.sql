@@ -10,14 +10,24 @@ CREATE TABLE tbl_location (
     city VARCHAR(255),
     province VARCHAR(255),
     category VARCHAR(100), -- e.g. Landmark, Church, Beach, Adventure
-    description TEXT
+    description TEXT,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 2. ITINERARY DAYS
 CREATE TABLE tbl_itinerary_day (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,  -- e.g., 'Day 1 • CEBU CITY TOUR'
-    description TEXT
+    description TEXT,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 3. ITINERARY LOCATIONS (M:N)
@@ -25,7 +35,12 @@ CREATE TABLE tbl_itinerary_day_locations (
     id BIGSERIAL PRIMARY KEY,
     itinerary_day_id BIGINT NOT NULL REFERENCES tbl_itinerary_day(id) ON DELETE CASCADE,
     location_id BIGINT NOT NULL REFERENCES tbl_location(id) ON DELETE CASCADE,
-    optional optional_flag DEFAULT 'No'
+    optional optional_flag DEFAULT 'No',
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 4. PACKAGES
@@ -33,7 +48,12 @@ CREATE TABLE tbl_package (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,   -- e.g., PACKAGE 1
     description TEXT,             -- e.g., CITY TOUR + MOALBOAL & BADIAN + OSLOB + BOHOL COUNTRY SIDE TOUR
-    duration_days INT NOT NULL
+    duration_days INT NOT NULL,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 5. PACKAGE -> ITINERARY DAYS (M:N)
@@ -42,6 +62,11 @@ CREATE TABLE tbl_package_itinerary (
     package_id BIGINT NOT NULL REFERENCES tbl_package(id) ON DELETE CASCADE,
     itinerary_day_id BIGINT NOT NULL REFERENCES tbl_itinerary_day(id) ON DELETE CASCADE,
     day_order SMALLINT NOT NULL, -- e.g., 1 for Day 1, 2 for Day 2, etc.
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     -- Unique constraint: no duplicate itinerary_day for same package
     CONSTRAINT uq_package_itinerary UNIQUE (package_id, itinerary_day_id)
@@ -55,6 +80,11 @@ CREATE TABLE tbl_package_pricing (
     pax_max INT,
     price_per_pax DECIMAL(10,2) NOT NULL,
 
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     -- Unique constraint: no duplicate package_id for same package price
     CONSTRAINT uq_package_id UNIQUE (package_id)
 );
@@ -65,7 +95,12 @@ CREATE TABLE tbl_optional_activity (
     name VARCHAR(255) NOT NULL UNIQUE,
     surcharge_amount DECIMAL(10,2) NOT NULL,
     unit VARCHAR(50), -- e.g., 'per pax', 'per hour'
-    description TEXT
+    description TEXT,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 8. ITINERARY DAY OPTIONAL ACTIVITIES (M:N)
@@ -74,6 +109,11 @@ CREATE TABLE tbl_itinerary_day_optional_activity (
     itinerary_day_id BIGINT NOT NULL REFERENCES tbl_itinerary_day(id) ON DELETE CASCADE,
     optional_activity_id BIGINT NOT NULL REFERENCES tbl_optional_activity(id) ON DELETE CASCADE,
 
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
     CONSTRAINT uq_itinerary_optional_activity UNIQUE (itinerary_day_id, optional_activity_id)
 );
 
@@ -81,13 +121,23 @@ CREATE TABLE tbl_itinerary_day_optional_activity (
 CREATE TABLE tbl_inclusion (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT
+    description TEXT,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE tbl_package_inclusion (
     id BIGSERIAL PRIMARY KEY,
     package_id BIGINT NOT NULL REFERENCES tbl_package(id) ON DELETE CASCADE,
     inclusion_id BIGINT NOT NULL REFERENCES tbl_inclusion(id) ON DELETE CASCADE,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     -- Prevent duplicates
     CONSTRAINT uq_package_inclusion UNIQUE (package_id, inclusion_id)
@@ -101,7 +151,12 @@ CREATE TABLE tbl_guest (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone_number VARCHAR(50),
     country VARCHAR(100) DEFAULT 'Philippines',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 11. BOOKINGS
@@ -118,7 +173,12 @@ CREATE TABLE tbl_booking (
     status booking_status DEFAULT 'Pending',
     total_price DECIMAL(10,2) NOT NULL,
     payment_status VARCHAR(50) DEFAULT 'Unpaid',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- 12. REVIEWS
@@ -128,6 +188,11 @@ CREATE TABLE tbl_review (
     guest_id BIGINT NOT NULL REFERENCES tbl_guest(id) ON DELETE CASCADE,
     rating SMALLINT CHECK (rating BETWEEN 1 AND 5),
     review_text TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    cid BIGINT,
+    ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    mid BIGINT,
+    mtime TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

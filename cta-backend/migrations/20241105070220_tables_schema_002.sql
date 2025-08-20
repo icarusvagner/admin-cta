@@ -9,6 +9,7 @@ CREATE TABLE tbl_acc_session (
   refresh_token VARCHAR(255) NOT NULL,
   is_active session_typ DEFAULT 'Active',
   expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '1 day'),
+
   cid BIGINT,
   ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   mid BIGINT,
@@ -21,6 +22,7 @@ CREATE TABLE tbl_permissions (
   level SMALLINT NOT NULL default 0,
   admin_id BIGINT NOT NULL,
   role_id BIGINT NOT NULL,
+
   cid BIGINT,
   ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   mid BIGINT,
@@ -33,6 +35,7 @@ CREATE TABLE tbl_roles (
   -- e.g. VIEWER/MANAGES USERS(update, remove, insert, select 'only for users')/MANAGES BOOKS(update, remove, insert, select 'only for books')/(add for more).
   role VARCHAR(255) NOT NULL DEFAULT 'VIEWER', -- we'll add a default value for a VIEWER only
   level INT NOT NULL DEFAULT 0, -- 0 means VIEWER
+
   cid BIGINT,
   ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   mid BIGINT,
@@ -47,8 +50,8 @@ CREATE TABLE tbl_acc_logs (
   log_stat login_stat NOT NULL DEFAULT 'Hold',
 
   cid BIGINT,
-	ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	mid BIGINT,
-	mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	PRIMARY KEY(id)
+  ctime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  mid BIGINT,
+  mtime TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY(id)
 );
