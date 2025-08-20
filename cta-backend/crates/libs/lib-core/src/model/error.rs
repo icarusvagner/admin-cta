@@ -55,28 +55,6 @@ pub enum Error {
     #[error("Password error fail")]
     Pwd(#[from] pass::Error),
 
-    // -- Externals
-    #[error("Sqlx error - cause: {0:?}")]
-    DatabaseError(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        sqlx::Error,
-    ),
-    #[error("SEA Query error - cause: {0:?}")]
-    SeaQueryError(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        sea_query::error::Error,
-    ),
-    #[error("IO error - cause: {0:#?}")]
-    Io(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        std::io::Error,
-    ),
-    #[error("Dbx error - cause: {0:?}")]
-    Dbx(#[from] dbx::Error),
-
     // CRUD Models error
     #[error("Account removed: {uname} email: {email} id: {id}")]
     AccountIsRemoved {
@@ -104,14 +82,32 @@ pub enum Error {
     CannotUpdateCidMid { entity: String, gen_id: i64 },
 
     // -- Externals
-    #[error("Modql Into Sea Error")]
-    ModqlIntoSea(#[serde_as(as = "DisplayFromStr")] modql::filter::IntoSeaError),
-}
-
-impl From<modql::filter::IntoSeaError> for Error {
-    fn from(value: modql::filter::IntoSeaError) -> Self {
-        Error::ModqlIntoSea(value)
-    }
+    #[error("Modql Into Sea Error {0:?}")]
+    ModqlIntoSea(
+        #[from]
+        #[serde_as(as = "DisplayFromStr")]
+        modql::filter::IntoSeaError,
+    ),
+    #[error("Sqlx error - cause: {0:?}")]
+    DatabaseError(
+        #[from]
+        #[serde_as(as = "DisplayFromStr")]
+        sqlx::Error,
+    ),
+    #[error("SEA Query error - cause: {0:?}")]
+    SeaQueryError(
+        #[from]
+        #[serde_as(as = "DisplayFromStr")]
+        sea_query::error::Error,
+    ),
+    #[error("IO error - cause: {0:#?}")]
+    Io(
+        #[from]
+        #[serde_as(as = "DisplayFromStr")]
+        std::io::Error,
+    ),
+    #[error("Dbx error - cause: {0:?}")]
+    Dbx(#[from] dbx::Error),
 }
 
 impl Error {
