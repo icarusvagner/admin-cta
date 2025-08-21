@@ -22,7 +22,7 @@ pub(crate) fn set_token_cookie(cookies: &Cookies, user: &str, salt: Uuid) -> Res
     cookie.set_secure(true); // only over HTTPS
     cookie.set_http_only(true); // not accessible from JS
     cookie.set_same_site(SameSite::Lax); // or None if frontend != backend
-    cookie.set_max_age(Duration::days(7));
+    cookie.set_max_age(Duration::days(3));
 
     cookies.add(cookie);
 

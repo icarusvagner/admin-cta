@@ -1,4 +1,5 @@
 use leptos::{either::Either, prelude::*, task::spawn_local};
+use phosphor_leptos::{Icon, TRASH};
 
 use crate::{error::{Error, Result}, server::location::api_get_locations, types::location::{ListLocationReturn, OneLocation}, utils::time::format_date_time};
 
@@ -56,6 +57,7 @@ pub fn LocationList() -> AnyView {
 										<th class="w-32">"Category"</th>
 										<th>"Description"</th>
 										<th class="w-32">"Created"</th>
+										<th></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -68,6 +70,13 @@ pub fn LocationList() -> AnyView {
 											<td class="capitalize">{child.category}</td>
 											<td>{child.description}</td>
 											<td>{format_date_time(child.ctime)}</td>
+											<td>
+												<div class="tooltip tooltip-left" data-tip="Remove Item">
+													<button class="btn btn-sm btn-soft btn-error">
+														<Icon icon=TRASH attr:class="w-5 h-5" />
+													</button>
+												</div>
+											</td>
 										</tr>
 									</For>
 								</tbody>

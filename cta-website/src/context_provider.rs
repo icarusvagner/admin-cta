@@ -4,7 +4,7 @@ use leptos::{
     server::codee::string::{FromToStringCodec, JsonSerdeCodec},
 };
 use leptos_meta::*;
-use leptos_use::{storage::use_local_storage, use_cookie};
+use leptos_use::storage::use_local_storage;
 
 use crate::types::theme::Themes;
 
@@ -31,7 +31,6 @@ impl ConfigProvider {
 
     pub fn is_logged_in(&mut self) {
         let (login, set_login, _) = use_local_storage::<bool, FromToStringCodec>("logged-in");
-
         set_login.set(true);
 
         self.logged_in.update(|va| *va = login.get());
