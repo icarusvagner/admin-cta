@@ -1,10 +1,52 @@
 
-use crate::{error::Error, types::request_types::{CreateLocationPayload, LocationReturn, WithIdReturn}, utils::api::{request_get, request_post}};
+use serde_json::{json, Value};
 
-pub async fn api_create_location(data: CreateLocationPayload) -> Result<WithIdReturn, Error> {
-    request_post::<CreateLocationPayload, WithIdReturn>("/location".into(), data).await
+use crate::{error::Error, types::{location::{CountLocationReturn, ListLocationReturn, LocationReturn}, request_types::CreateLocationPayload}, utils::api::request_post};
+
+pub async fn api_create_location(data: CreateLocationPayload) -> Result<Value, Error> {
+    let rpc_data = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "create_location",
+        "params": {
+            "data": data
+        }
+    });
+
+    request_post::<Value, Value>("/rpc".into(), rpc_data).await
 }
 
-pub async fn api_get_location_by_id(data: i64) -> Result<LocationReturn, Error> {
-    request_get::<LocationReturn>(format!("/location/get/{data}")).await
+pub async fn api_get_location_by_id(id: i64) -> Result<LocationReturn, Error> {
+    let rpc_data = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "get_location",
+        "params": {
+            "id": id
+        }
+    });
+
+    request_post::<Value, LocationReturn>("/rpc".into(), rpc_data).await
+}
+
+pub async fn api_get_locations() -> Result<ListLocationReturn, Error> {
+    let rpc_data = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "list_locations",
+        "params": { }
+    });
+
+    request_post::<Value, ListLocationReturn>("/rpc".into(), rpc_data).await
+}
+
+pub async fn api_count_locations() -> Result<CountLocationReturn, Error> {
+    let rpc_data = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "count_location",
+        "params": { }
+    });
+
+    request_post::<Value, CountLocationReturn>("/rpc".into(), rpc_data).await
 }

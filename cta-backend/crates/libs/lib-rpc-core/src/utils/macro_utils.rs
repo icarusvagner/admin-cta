@@ -65,6 +65,15 @@ macro_rules! generate_common_rpc_fns {
                 $bmc::delete(&ctx, &mm, id).await?;
                 Ok(entity.into())
             }
+
+            pub async fn [<count_ $suffix>] (
+                ctx: Ctx,
+                mm: ModelManager,
+                params: ParamsList<$filter>
+            ) -> Result<DataRpcResult<i64>> {
+                let count = $bmc::count(&ctx, &mm, params.filters).await?;
+                Ok(count.into())
+            }
         }
     };
 }

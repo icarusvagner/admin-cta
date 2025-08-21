@@ -11,7 +11,8 @@ pub fn rpc_router_builder() -> RouterBuilder {
         get_location,
         list_locations,
         update_location,
-        delete_location
+        delete_location,
+        count_location
     )
 }
 

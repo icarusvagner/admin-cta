@@ -1,6 +1,14 @@
+use chrono::DateTime;
 use time::{Duration, OffsetDateTime};
 
 pub use time::format_description::well_known::Rfc3339;
+
+pub fn format_date_time(date_time: String) -> Result<String> {
+    let human_time = DateTime::parse_from_rfc3339(&date_time)
+        .map_err(|ex| Error::FailToDateParse(ex.to_string()))?;
+
+    Ok(human_time.format(r"%b %m, %Y").to_string())
+}
 
 pub fn now_utc() -> OffsetDateTime {
     OffsetDateTime::now_utc()

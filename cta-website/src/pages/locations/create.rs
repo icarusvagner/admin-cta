@@ -1,8 +1,9 @@
 use leptos::{either::Either, prelude::*, task::spawn_local};
+use serde_json::{Value};
 
 use crate::{error::{Error, Result}, server::location::api_create_location, types::request_types::{CreateLocationPayload, WithIdReturn}};
 
-async fn send_create_location(data: CreateLocationField) -> Result<WithIdReturn> {
+async fn send_create_location(data: CreateLocationField) -> Result<Value> {
     let CreateLocationField { name, city, province, category, description } = data;
     let loc_c = CreateLocationPayload { name: name.to_string(), city: city.to_string(), province: province.to_string(), category: category.to_string(), description: description.to_string()};
 
@@ -29,7 +30,8 @@ pub fn LocationCreate() -> AnyView {
 			spawn_local(async move {
 				match send_create_location(form_data()).await {
 					Ok(res) => {
-						leptos::logging::log!("Created {}", res.result.id);
+						leptos::logging::log!("Created {}", res);
+						location_form.set(CreateLocationField::default());
 						btn_state.set(false);
 					}
 					Err(err) => {

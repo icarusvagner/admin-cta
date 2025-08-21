@@ -1,60 +1,81 @@
-use leptos::{prelude::*, task::spawn_local};
+use leptos::{either::Either, prelude::*, task::spawn_local};
 
-use crate::{error::{Error, Result}, server::location::api_get_location_by_id, types::request_types::LocationReturn};
+use crate::{error::{Error, Result}, server::location::api_get_locations, types::location::{ListLocationReturn, OneLocation}, utils::time::format_date_time};
 
-async fn get_one_location(id: i64) -> Result<LocationReturn> {
-    match api_get_location_by_id(id).await {
-        Ok(res) => Ok(res),
-        Err(err) => {
+async fn get_list_locations() -> Result<ListLocationReturn> {
+	match api_get_locations().await {
+		Ok(res) => Ok(res),
+		Err(err) => {
             leptos::logging::log!("{}", err.to_string());
             Err(Error::Network(err.to_string()))
-        }
-    }
+		}
+	}
 }
 
 #[component]
 pub fn LocationList() -> AnyView {
+	let list_loc = RwSignal::new(Vec::<OneLocation>::default());
+	let result_err = RwSignal::new(String::new());
+
 	spawn_local(async move {
-		let loc = get_one_location(1).await;
-		leptos::logging::log!("{:?}", loc);
+		let locs = get_list_locations().await;
+		match locs {
+			Ok(res) => {
+				// leptos::logging::log!("{:#?}", res.result);
+				list_loc.set(res.result.data);
+			}
+			Err(err) => {
+				result_err.set(err.to_string());
+			}
+		}
 	});
 
     view! {
 		<div class="overflow-x-auto">
-			<table class="table">
-				// <!-- head -->
-				<thead>
-					<tr>
-						<th></th>
-						<th>Name</th>
-						<th>Job</th>
-						<th>Favorite Color</th>
-					</tr>
-				</thead>
-				<tbody>
-					// <!-- row 1 -->
-					<tr>
-						<th>1</th>
-						<td>Cy Ganderton</td>
-						<td>Quality Control Specialist</td>
-						<td>Blue</td>
-					</tr>
-					// <!-- row 2 -->
-					<tr class="hover:bg-base-300">
-						<th>2</th>
-						<td>Hart Hagerty</td>
-						<td>Desktop Support Technician</td>
-						<td>Purple</td>
-					</tr>
-					// <!-- row 3 -->
-					<tr>
-						<th>3</th>
-						<td>Brice Swyre</td>
-						<td>Tax Accountant</td>
-						<td>Red</td>
-					</tr>
-				</tbody>
-			</table>
+			{move || {
+				if list_loc.get().len().lt(&1) {
+					Either::Left(
+						view! {
+							<div class="flex flex-col justify-center items-center p-12 w-full">
+								<h1 class="text-4xl font-bold tracking-wider">
+									"No data are retrieved"
+								</h1>
+							</div>
+						},
+					)
+				} else {
+					Either::Right(
+						view! {
+							<table class="table">
+								<thead>
+									<tr>
+										<th>"Loc #"</th>
+										<th class="w-32">"Name"</th>
+										<th class="w-32">"City"</th>
+										<th class="w-32">"Province"</th>
+										<th class="w-32">"Category"</th>
+										<th>"Description"</th>
+										<th class="w-32">"Created"</th>
+									</tr>
+								</thead>
+								<tbody>
+									<For each=move || list_loc.get() key=|loc| loc.id let:child>
+										<tr>
+											<th>{child.id}</th>
+											<td class="capitalize">{child.name}</td>
+											<td class="capitalize">{child.city}</td>
+											<td class="capitalize">{child.province}</td>
+											<td class="capitalize">{child.category}</td>
+											<td>{child.description}</td>
+											<td>{format_date_time(child.ctime)}</td>
+										</tr>
+									</For>
+								</tbody>
+							</table>
+						},
+					)
+				}
+			}}
 		</div>
 	}
     .into_any()

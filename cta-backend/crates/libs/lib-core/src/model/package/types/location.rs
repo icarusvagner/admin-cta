@@ -42,13 +42,9 @@ pub struct LocationForCreate {
 pub struct LocationFilter {
     pub id: Option<OpValsInt64>,
     pub name: Option<OpValsString>,
-
-    pub cid: Option<OpValsInt64>,
-    #[modql(to_sea_value_fn = "time_to_sea_value")]
-    pub ctime: Option<OpValsValue>,
-    pub mid: Option<OpValsInt64>,
-    #[modql(to_sea_value_fn = "time_to_sea_value")]
-    pub mtime: Option<OpValsValue>,
+    pub city: Option<OpValsString>,
+    pub province: Option<OpValsString>,
+    pub category: Option<OpValsString>,
 }
 
 #[derive(Fields, Deserialize)]
