@@ -2,12 +2,13 @@ mod error;
 
 pub use self::error::{Error, Result};
 
-// #[cfg_attr(feature = "with-rpc", derive(rpc_router::RpcResource))]
+#[cfg_attr(feature = "with-rpc", derive(rpc_router::RpcResource))]
 #[derive(Debug, Clone)]
 pub struct Ctx {
     pub user_id: i64,
 }
 
+#[cfg_attr(feature = "with-rpc", derive(rpc_router::RpcResource))]
 #[derive(Debug, Clone)]
 pub struct AuthUser {
     pub uname: String,

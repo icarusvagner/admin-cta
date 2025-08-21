@@ -1,10 +1,7 @@
 pub(crate) mod dbx;
-mod error;
 
 use crate::core_config;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
-
-pub use self::error::{Error, Result};
 
 pub type Db = Pool<Postgres>;
 

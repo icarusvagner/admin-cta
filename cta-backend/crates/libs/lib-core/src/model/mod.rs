@@ -13,6 +13,7 @@ pub mod location;
 
 pub use self::error::{Error, Result};
 
+#[cfg_attr(feature = "with-rpc", derive(rpc_router::RpcResource))]
 #[derive(Clone)]
 pub struct ModelManager {
     dbx: Dbx,

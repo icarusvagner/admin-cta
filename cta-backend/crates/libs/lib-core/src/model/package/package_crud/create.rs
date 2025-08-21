@@ -22,7 +22,7 @@ pub struct PackgeBmc;
 
 impl PackgeBmc {
     pub async fn create_package(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: PackageForCreate,
     ) -> Result<i64> {
@@ -69,7 +69,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_location(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: LocationForCreate,
     ) -> Result<i64> {
@@ -127,7 +127,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_itinerary_day(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: ItineraryDayForCreate,
     ) -> Result<i64> {
@@ -167,7 +167,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_itinerary_day_location(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: ItineraryDayLocationsForCreate,
     ) -> Result<i64> {
@@ -215,7 +215,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_package_itinerary(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: PackageItineraryForCreate,
     ) -> Result<i64> {
@@ -260,7 +260,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_package_pricing(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: PackagePricingForCreate,
     ) -> Result<i64> {
@@ -312,7 +312,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_optional_activity(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: OptionalActivityForCreate,
     ) -> Result<i64> {
@@ -364,7 +364,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_itinerary_day_optional_activity(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: ItineraryDayOptionalActivityForCreate,
     ) -> Result<i64> {
@@ -410,7 +410,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_inclusion(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: InclusionForCreate,
     ) -> Result<i64> {
@@ -453,7 +453,7 @@ impl PackgeBmc {
     }
 
     pub async fn create_package_inclusion(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         data: PackageInclusionForCreate,
     ) -> Result<i64> {

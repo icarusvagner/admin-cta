@@ -1,113 +1,100 @@
 use std::borrow::Cow;
 
+use derive_more::derive::From;
 use lib_auth::pass;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 use sqlx::error::DatabaseError;
-use thiserror::Error as ThisError;
 
 use super::store::dbx;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[serde_as]
-#[derive(Debug, Serialize, ThisError)]
+#[derive(Debug, Serialize, From)]
 pub enum Error {
-    #[error("OffsetDateTime TimeErrorComponentRange - cause: {0}")]
-    TimeErrorComponentRange(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        time::error::ComponentRange,
-    ),
-    #[error("Chrono parsing error - cause: {0}")]
-    ChronoError(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        chrono::ParseError,
-    ),
-    #[error("Birth date is in invalid format")]
+    #[from]
+    TimeErrorComponentRange(#[serde_as(as = "DisplayFromStr")] time::error::ComponentRange),
+    #[from]
+    ChronoError(#[serde_as(as = "DisplayFromStr")] chrono::ParseError),
     InvalidBirthdateFormat,
-    #[error("Database entity not found - entity: {entity:?} - id: {id:?}")]
-    EntityNotFound { entity: &'static str, id: i64 },
-    #[error("List limit over max - max: {max:?} - actual: {actual:?}")]
-    ListLimitOverMax { max: i64, actual: i64 },
-    #[error("Count failed")]
+    EntityNotFound {
+        entity: &'static str,
+        id: i64,
+    },
+    ListLimitOverMax {
+        max: i64,
+        actual: i64,
+    },
     CountFail,
-    #[error("Admin already exist in our records - username: {username:?}")]
-    AdminAlreadyExists { username: String },
-    #[error("Database unique violation occur - table: {table:?} - constraint: {constraint:?}")]
-    UniqueViolation { table: String, constraint: String },
-    #[error("Cannot create model manager provider: {0}")]
+    AdminAlreadyExists {
+        username: String,
+    },
+    UniqueViolation {
+        table: String,
+        constraint: String,
+    },
     CantCreateModelManagerProvider(String),
 
     // --- For all data CRUD
-    #[error("Cannot create data: {0}")]
     CantCreateData(String),
-    #[error("Cannot retrieve data: {0}")]
     CantRetrieveData(String),
-    #[error("Cannot update data: {0}")]
     CantUpdateData(String),
-    #[error("Cannot delete data: {0}")]
     CantDeleteData(String),
-    #[error("Constraint table error: {0}")]
     ConstraintErrorTable(String),
 
-    #[error("Password error fail")]
-    Pwd(#[from] pass::Error),
+    #[from]
+    Dbx(dbx::Error),
+
+    #[from]
+    Pwd(pass::Error),
 
     // CRUD Models error
-    #[error("Account removed: {uname} email: {email} id: {id}")]
     AccountIsRemoved {
         uname: String,
         email: String,
         id: i64,
     },
-    #[error("Admin is already removed: admin_id: {admin_id}")]
-    AdminAlreadyRemoved { admin_id: i64 },
-    #[error("Insert failed: {entity} cause: {cause:?}")]
-    InsertionFailed { entity: String, cause: String },
-    #[error("Selection failed: {entity} cause: {cause:?}")]
-    SelectionFailed { entity: String, cause: String },
-    #[error("Deletion failed: {entity} cause: {cause:?}")]
-    DeletionFailed { entity: String, cause: String },
-    #[error("Updating failed: {entity} cause: {cause:?}")]
-    UpdatingFailed { entity: String, cause: String },
-    #[error("Username not found: {entity} cause: {cause:?}")]
-    UsernameNotFound { entity: String, cause: String },
-    #[error("Username is already in the record: {uname}")]
-    UsernameAlreadyExists { uname: String },
+    AdminAlreadyRemoved {
+        admin_id: i64,
+    },
+    InsertionFailed {
+        entity: String,
+        cause: String,
+    },
+    SelectionFailed {
+        entity: String,
+        cause: String,
+    },
+    DeletionFailed {
+        entity: String,
+        cause: String,
+    },
+    UpdatingFailed {
+        entity: String,
+        cause: String,
+    },
+    UsernameNotFound {
+        entity: String,
+        cause: String,
+    },
+    UsernameAlreadyExists {
+        uname: String,
+    },
 
     // General CID and MID
-    #[error("Updating cid and mid failed - entity: {entity}, gen_id: {gen_id}")]
-    CannotUpdateCidMid { entity: String, gen_id: i64 },
+    CannotUpdateCidMid {
+        entity: String,
+        gen_id: i64,
+    },
 
     // -- Externals
-    #[error("Modql Into Sea Error {0:?}")]
-    ModqlIntoSea(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        modql::filter::IntoSeaError,
-    ),
-    #[error("Sqlx error - cause: {0:?}")]
-    DatabaseError(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        sqlx::Error,
-    ),
-    #[error("SEA Query error - cause: {0:?}")]
-    SeaQueryError(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        sea_query::error::Error,
-    ),
-    #[error("IO error - cause: {0:#?}")]
-    Io(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        std::io::Error,
-    ),
-    #[error("Dbx error - cause: {0:?}")]
-    Dbx(#[from] dbx::Error),
+    #[from]
+    ModqlIntoSea(#[serde_as(as = "DisplayFromStr")] modql::filter::IntoSeaError),
+    #[from]
+    DatabaseError(#[serde_as(as = "DisplayFromStr")] sqlx::Error),
+    #[from]
+    SeaQueryError(#[serde_as(as = "DisplayFromStr")] sea_query::error::Error),
 }
 
 impl Error {
@@ -142,3 +129,79 @@ impl Error {
         }
     }
 }
+
+impl core::fmt::Display for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
+        match self {
+            Error::TimeErrorComponentRange(e) => {
+                write!(f, "OffsetDateTime TimeErrorComponentRange - cause: {e}")
+            }
+            Error::ChronoError(e) => write!(f, "Chrono parsing error - cause: {e}"),
+            Error::InvalidBirthdateFormat => write!(f, "Birth date is in invalid format"),
+            Error::EntityNotFound { entity, id } => write!(
+                f,
+                "Database entity not found - entity: {entity:?} - id: {id}"
+            ),
+            Error::ListLimitOverMax { max, actual } => {
+                write!(f, "List limit over max - max: {max} - actual: {actual}")
+            }
+            Error::CountFail => write!(f, "Count failed"),
+            Error::AdminAlreadyExists { username } => write!(
+                f,
+                "Admin already exist in our records - username: {username:?}"
+            ),
+            Error::UniqueViolation { table, constraint } => write!(
+                f,
+                "Database unique violation occur - table: {table:?} - constraint: {constraint:?}"
+            ),
+            Error::CantCreateModelManagerProvider(cause) => {
+                write!(f, "Cannot create model manager provider: {cause}")
+            }
+
+            Error::CantCreateData(cause) => write!(f, "Cannot create data: {cause}"),
+            Error::CantRetrieveData(cause) => write!(f, "Cannot retrieve data: {cause}"),
+            Error::CantUpdateData(cause) => write!(f, "Cannot update data: {cause}"),
+            Error::CantDeleteData(cause) => write!(f, "Cannot delete data: {cause}"),
+            Error::ConstraintErrorTable(cause) => write!(f, "Constraint table error: {cause}"),
+
+            Error::Pwd(e) => write!(f, "Password error fail: {e}"),
+
+            Error::AccountIsRemoved { uname, email, id } => {
+                write!(f, "Account removed: {uname} email: {email} id: {id}")
+            }
+            Error::AdminAlreadyRemoved { admin_id } => {
+                write!(f, "Admin is already removed: admin_id: {admin_id}")
+            }
+            Error::InsertionFailed { entity, cause } => {
+                write!(f, "Insert failed: {entity} cause: {cause}")
+            }
+            Error::SelectionFailed { entity, cause } => {
+                write!(f, "Selection failed: {entity} cause: {cause}")
+            }
+            Error::DeletionFailed { entity, cause } => {
+                write!(f, "Deletion failed: {entity} cause: {cause}")
+            }
+            Error::UpdatingFailed { entity, cause } => {
+                write!(f, "Updating failed: {entity} cause: {cause}")
+            }
+            Error::UsernameNotFound { entity, cause } => {
+                write!(f, "Username not found: {entity} cause: {cause}")
+            }
+            Error::UsernameAlreadyExists { uname } => {
+                write!(f, "Username is already in the record: {uname}")
+            }
+
+            Error::CannotUpdateCidMid { entity, gen_id } => write!(
+                f,
+                "Updating cid and mid failed - entity: {entity}, gen_id: {gen_id}"
+            ),
+
+            Error::ModqlIntoSea(e) => write!(f, "Modql Into Sea Error {e:?}"),
+            Error::DatabaseError(e) => write!(f, "Sqlx error - cause: {e:?}"),
+            Error::SeaQueryError(e) => write!(f, "SEA Query error - cause: {e:?}"),
+            Error::Dbx(e) => write!(f, "Dbx error - cause: {e:?}"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}

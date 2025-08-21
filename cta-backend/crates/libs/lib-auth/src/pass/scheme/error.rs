@@ -1,35 +1,35 @@
 // region: Error
 
 use serde::Serialize;
-use serde_with::{serde_as, DisplayFromStr};
-use thiserror::Error as ThisError;
+use serde_with::serde_as;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 // region: --- Error boilerplate
 
 #[serde_as]
-#[derive(Debug, Serialize, ThisError)]
+#[derive(Debug, Serialize)]
 pub enum Error {
-    #[error("Error with key")]
     Key,
-    #[error("Error with salt")]
     Salt,
-    #[error("Error with hash")]
     Hash,
-    #[error("Error with password validation")]
     PassValidate,
-    #[error("Error with scheme not found - cause: {0}")]
     SchemeNotFound(String),
-
-    // --- IO error
-    #[error("IO error")]
-    Io(
-        #[from]
-        #[serde_as(as = "DisplayFromStr")]
-        std::io::Error,
-    ),
 }
+
+impl core::fmt::Display for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
+        match self {
+            Error::Key => write!(f, "Error with key"),
+            Error::Salt => write!(f, "Error with salt"),
+            Error::Hash => write!(f, "Error with hash"),
+            Error::PassValidate => write!(f, "Error with password validation"),
+            Error::SchemeNotFound(err) => write!(f, "Error with scheme not found - cause {err}"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 // endregion: --- Error boilerplate
 

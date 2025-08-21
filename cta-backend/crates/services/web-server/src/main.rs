@@ -20,13 +20,11 @@ use tower_cookies::CookieManagerLayer;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 use tracing_subscriber::EnvFilter;
-use web::{routes_admin, routes_email, routes_login};
+use web::{routes_email, routes_login};
 
 mod config;
 mod error;
 mod web;
-
-use crate::web::{routes_location, routes_package};
 
 pub use self::error::{Error, Result};
 use config::web_config;
@@ -63,17 +61,21 @@ async fn main() -> Result<()> {
         .allow_credentials(true)
         .allow_headers([CONTENT_TYPE, ACCESS_CONTROL_ALLOW_ORIGIN, ACCEPT]);
 
-    let routes_apis = Router::new()
-        .merge(routes_admin::routes(mm.clone()))
-        .merge(routes_package::routes(mm.clone()))
-        .merge(routes_location::routes(mm.clone()))
-        .route_layer(middleware::from_fn(mw_ctx_require));
+    // let routes_apis = Router::new()
+    //     .merge(routes_admin::routes(mm.clone()))
+    //     .merge(routes_package::routes(mm.clone()))
+    //     .merge(routes_location::routes(mm.clone()))
+    //     .route_layer(middleware::from_fn(mw_ctx_require));
+
+    // Define the rpc router
+    let routes_rpc =
+        web::routes_rpc::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
 
     let app = Router::new()
         .merge(routes_login::routes(mm.clone()))
         .merge(routes_email::routes())
         .route("/api/greetings", get(greetings))
-        .nest("/api", routes_apis)
+        .nest("/api", routes_rpc)
         .route_layer(cors_layer)
         .layer(TraceLayer::new_for_http())
         .layer(middleware::map_response(mw_reponse_map))

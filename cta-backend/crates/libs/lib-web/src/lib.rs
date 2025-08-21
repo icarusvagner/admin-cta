@@ -4,3 +4,5 @@ pub mod log;
 pub mod middleware;
 pub mod routes;
 pub mod utils;
+
+pub use error::Error;

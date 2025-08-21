@@ -15,7 +15,7 @@ use crate::{
 impl PackageBy for Location {}
 
 impl PackgeBmc {
-    pub async fn get_location_by_id<E>(ctx: &Ctx, mm: &ModelManager, id: i64) -> Result<E>
+    pub async fn get_location_by_id<E>(_ctx: &Ctx, mm: &ModelManager, id: i64) -> Result<E>
     where
         E: PackageBy,
     {
@@ -50,7 +50,7 @@ impl PackgeBmc {
     }
 
     pub async fn list_locations<E, F>(
-        ctx: &Ctx,
+        _ctx: &Ctx,
         mm: &ModelManager,
         filter: Option<F>,
         list_options: Option<ListOptions>,
