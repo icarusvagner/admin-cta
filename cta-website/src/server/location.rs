@@ -50,3 +50,16 @@ pub async fn api_count_locations() -> Result<CountLocationReturn, Error> {
 
     request_post::<Value, CountLocationReturn>("/rpc".into(), rpc_data).await
 }
+
+pub async fn api_remove_location(id: i64) -> Result<Value, Error> {
+    let rpc_data = json!({
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "delete_location",
+        "params": {
+            "id": id
+        }
+    });
+
+    request_post::<Value, Value>("/rpc".into(), rpc_data).await
+}

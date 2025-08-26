@@ -1,7 +1,8 @@
+use leptoaster::ToastBuilder;
 use leptos::{either::Either, prelude::*, task::spawn_local};
 use serde_json::{Value};
 
-use crate::{error::{Error, Result}, server::location::api_create_location, types::request_types::{CreateLocationPayload, WithIdReturn}};
+use crate::{error::{Error, Result}, server::location::api_create_location, types::request_types::{CreateLocationPayload}};
 
 async fn send_create_location(data: CreateLocationField) -> Result<Value> {
     let CreateLocationField { name, city, province, category, description } = data;
@@ -29,10 +30,11 @@ pub fn LocationCreate() -> AnyView {
 		if !form_data().name.is_empty() && !form_data().city.is_empty() && !form_data().province.is_empty() && !form_data().category.is_empty() && !form_data().description.is_empty() {
 			spawn_local(async move {
 				match send_create_location(form_data()).await {
-					Ok(res) => {
-						leptos::logging::log!("Created {}", res);
+					Ok(_) => {
 						location_form.set(CreateLocationField::default());
 						btn_state.set(false);
+					    #[allow(unused_must_use)]
+						ToastBuilder::new("Successfully Created").with_level(leptoaster::ToastLevel::Success).with_dismissable(true).with_expiry(Some(2_500)).with_progress(true).with_position(leptoaster::ToastPosition::TopRight);
 					}
 					Err(err) => {
 						result_err.set(err.to_string());
