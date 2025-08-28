@@ -22,7 +22,7 @@ pub enum Error {
     ElementNotFound,
     EmptyInputs,
     FailedToCreate(String),
-    Forbidden,
+    Forbidden(String),
     GlooFileRead(String),
     LangCode,
     Network(String),
@@ -76,7 +76,7 @@ impl std::fmt::Display for Error {
             Self::DynInto => write!(f, "Dynamic conversion error."),
             Self::ElementNotFound => write!(f, "Element not found error."),
             Self::EmptyInputs => write!(f, "Empty inputs."),
-            Self::Forbidden => write!(f, "Forbidden request"),
+            Self::Forbidden(err) => write!(f, "Forbidden request {err}"),
             Self::FailedToCreate(err) => write!(f, "{err}"),
             Self::GlooFileRead(error) => {
                 write!(f, "File Read Error: {error}")

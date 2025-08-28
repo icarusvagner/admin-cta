@@ -16,8 +16,7 @@ async fn send_login_api(username: String, pwd: String) -> Result<LoginReturn> {
         match api_login_req(data).await {
             Ok(res) => Ok(res),
             Err(ex) => {
-                leptos::logging::log!("Something went wrong: {}", ex.to_string());
-                Err(Error::Network(ex.to_string()))
+                Err(Error::Forbidden(ex.to_string()))
             }
         }
     } else {
@@ -66,124 +65,93 @@ pub fn LoginPage() -> AnyView {
     };
 
     view! {
-		<section class="flex flex-col justify-center items-center min-h-screen">
-			<form
-				on:submit=submit_form
-				id="submit_form"
-				name="submit_form"
-				class="p-10 mx-auto space-y-6 rounded border w-xl border-base-100 bg-base-200"
-			>
-				<div class="flex gap-5 justify-between items-center">
+		<section class="flex justify-center items-center mx-auto min-h-screen w-5xl">
+			<div class="grid grid-cols-2 w-full rounded-2xl bg-base-200">
+				<div>
 					<img
-						src="public/emblem-logo.png"
-						alt="CTA logo"
-						class="h-24"
+						src="/public/images/login-office-JBFguH2f.jpeg"
+						alt="login office"
+						class="w-full"
 					/>
-					<h1 class="text-2xl font-bold tracking-wide">
-						"Signin to your CTA admin account."
+				</div>
+				<div class="flex flex-col justify-center p-12 space-y-5">
+					<h1 class="text-2xl font-medium tracking-wider">
+						"Admin Login"
 					</h1>
+					<form
+						class="space-y-8"
+						on:submit=submit_form
+						id="submit_form"
+						name="submit_form"
+					>
+						<label for="username" class="flex flex-col gap-1">
+							<span>"Username"</span>
+
+							<input
+								autocomplete="username"
+								prop:value=move || form_input.get().username
+								on:input=move |e| {
+									let mut current = form_input.get();
+									current.username = event_target_value(&e);
+									form_input.set(current);
+								}
+								type="text"
+								placeholder="admin123456"
+								id="username"
+								name="username"
+								class="py-2 px-3 w-full rounded border outline-none validator border-base-300"
+								required
+								pattern=r#"^(?=.{3,16}$)[a-zA-Z0-9_]+$"#
+								minlength="3"
+								maxlength="30"
+								title="Only letters, numbers or dash"
+							/>
+						</label>
+
+						<label for="password" class="flex flex-col gap-1">
+							<span>"Password"</span>
+
+							<input
+								autocomplete="new-password"
+								prop:value=move || form_input.get().password
+								on:input=move |e| {
+									let mut current = form_input.get();
+									current.password = event_target_value(&e);
+									form_input.set(current);
+								}
+								type="password"
+								id="password"
+								name="password"
+								class="py-2 px-3 w-full rounded border outline-none validator border-base-300"
+								required
+								placeholder="********"
+								minlength="8"
+								pattern=r#"(?=.*\d)(?=.*[a-z]).{8,}"#
+								title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+							/>
+						</label>
+
+						<button
+							type="submit"
+							class="w-full text-xl font-semibold tracking-wide btn btn-primary"
+							disabled=move || btn_state.get()
+						>
+							{move || {
+								if !btn_state.get() {
+									Either::Left(view! { <span>"Submit"</span> })
+								} else {
+									Either::Right(
+										view! {
+											<span class="loading loading-spinner"></span>
+											"Loading"
+										},
+									)
+								}
+							}}
+						</button>
+					</form>
 				</div>
-
-				<div class="flex flex-col gap-0.5">
-					<label class="floating-label">
-						<input
-							autocomplete="username"
-							prop:value=move || form_input.get().username
-							on:input=move |e| {
-								let mut current = form_input.get();
-								current.username = event_target_value(&e);
-								form_input.set(current);
-							}
-							type="text"
-							placeholder="Username *"
-							id="username"
-							name="username"
-							class="w-full validator input input-lg"
-							required
-							pattern=r#"^(?=.{3,16}$)[a-zA-Z0-9_]+$"#
-							minlength="3"
-							maxlength="30"
-							title="Only letters, numbers or dash"
-						/>
-						<span>"Username *"</span>
-
-					// {move || {
-					// if !form_input.get().username.is_empty() {
-					// Either::Left(
-					// view! {
-					// <p class="validator-hint">
-					// "Must be 3 to 30 characters" <br />
-					// "containing only letters, numbers or dash"
-					// </p>
-					// },
-					// )
-					// } else {
-					// Either::Right(())
-					// }
-					// }}
-					</label>
-				</div>
-
-				<div class="flex flex-col gap-0.5">
-					<label class="floating-label">
-						<input
-							autocomplete="new-password"
-							prop:value=move || form_input.get().password
-							on:input=move |e| {
-								let mut current = form_input.get();
-								current.password = event_target_value(&e);
-								form_input.set(current);
-							}
-							type="password"
-							id="password"
-							name="password"
-							class="w-full validator input input-lg"
-							required
-							placeholder="Password *"
-							minlength="8"
-							pattern=r#"(?=.*\d)(?=.*[a-z]).{8,}"#
-							title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
-						/>
-						<span>"Password *"</span>
-
-					// {move || {
-					// if !form_input.get().password.is_empty() {
-					// Either::Left(
-					// view! {
-					// <p class="validator-hint">
-					// "Must be more than 8 characters, including" <br />
-					// "At least one number " <br />
-					// "At least one lowercase letter "<br />
-					// "At least one uppercase letter"
-					// </p>
-					// },
-					// )
-					// } else {
-					// Either::Right(())
-					// }
-					// }}
-					</label>
-				</div>
-
-				<button
-					type="submit"
-					class="w-full text-xl font-semibold tracking-wide btn btn-primary"
-					disabled=move || btn_state.get()
-				>
-					{move || {
-						if !btn_state.get() {
-							Either::Left(view! { <span>"Submit"</span> })
-						} else {
-							Either::Right(
-								view! {
-									<span class="loading loading-spinner"></span>
-									"Loading"
-								},
-							)
-						}
-					}}
-				</button>
-			</form>
+			</div>
 		</section>
 	}.into_any()
 }

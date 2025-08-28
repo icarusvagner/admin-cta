@@ -108,7 +108,10 @@ where
 					Err(Error::SerdeJson("Unauthorized Error 401".to_string()))
 				}
 			}
-			403 => Err(Error::Forbidden),
+			403 => {
+				let data: Result<AuthorizeErrors, _> = serde_json::from_str(&error_txt);
+				Err(Error::Forbidden(data.map(|d| d.message).unwrap_or_else(|_| error_txt)))
+			},
 			404 => {
 				let data: Result<AuthorizeErrors, _> =
 					serde_json::from_str(&error_txt);

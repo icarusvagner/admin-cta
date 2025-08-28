@@ -65,7 +65,13 @@ pub fn ConfigProvider(children: Children) -> AnyView {
             <Html
                 attr:lang="en"
                 attr:dir="ltr"
-                attr:data-theme=move || config_injection.theme.get()
+                attr:data-theme=move || {
+                    if !config_injection.theme.get().is_empty() {
+                        config_injection.theme.get()
+                    } else {
+                        "light".to_string()
+                    }
+                }
                 attr:class="font-arimo"
             />
 

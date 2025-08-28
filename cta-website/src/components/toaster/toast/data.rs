@@ -10,7 +10,7 @@ pub enum ToastLevel {
     Success,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ToastPosition {
     TopLeft,
     Top,

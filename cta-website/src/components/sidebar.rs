@@ -3,7 +3,7 @@ use std::fmt::Display;
 use leptos::{either::Either, prelude::*};
 use phosphor_leptos::{
     Icon, IconData, CARET_DOUBLE_LEFT, CARET_DOUBLE_RIGHT, CLIPBOARD_TEXT, HOUSE, MAP_PIN_AREA,
-    PACKAGE, TREASURE_CHEST,
+    PACKAGE, SIGN_OUT, TREASURE_CHEST,
 };
 
 #[derive(Debug, Clone, Default)]
@@ -20,81 +20,129 @@ pub fn SidebarMenu(#[prop(into)] view_margin: RwSignal<String>) -> AnyView {
     });
 
     view! {
-        <aside class=move || {
-            format!(
-                "fixed top-0 left-0 h-screen bg-base-300 duration-300 transition-all ease-in-out {}",
-                menu_state.get().class,
-            )
-        }>
-            <div class="relative w-full flex flex-col gap-4 h-full justify-center px-3">
-                <div class="absolute -right-5 top-3">
-                    <button
-                        class="btn btn-ghost btn-circle"
-                        on:click=move |_| {
-                            let mut curr = menu_state.get();
-                            if curr.state {
-                                view_margin.update(|val| *val = String::from("ml-24"));
-                                curr.class = String::from("w-24");
-                                curr.state = false;
-                            } else {
-                                view_margin.update(|val| *val = String::from("ml-64"));
-                                curr.class = String::from("w-64");
-                                curr.state = true;
-                            }
-                            menu_state.set(curr);
-                        }
-                    >
-                        {move || {
-                            if !menu_state.get().state {
-                                Either::Left(
-                                    view! { <Icon icon=CARET_DOUBLE_RIGHT attr:class="h-6 w-6" /> },
-                                )
-                            } else {
-                                Either::Right(
-                                    view! { <Icon icon=CARET_DOUBLE_LEFT attr:class="h-6 w-6" /> },
-                                )
-                            }
-                        }}
-                    </button>
-                </div>
+		<aside class=move || {
+			format!(
+				"fixed top-0 left-0 bg-base-300 duration-300 min-h-screen transition-all ease-in-out {}",
+				menu_state.get().class,
+			)
+		}>
+			<div class="flex relative flex-col gap-4 w-full h-full">
+				<a href="/" class="flex gap-2 items-center py-2.5 px-3 w-full">
+					<img
+						src="/public/emblem-logo.png"
+						class="h-16"
+						alt="horizontal cta logo"
+					/>
+					{move || {
+						if menu_state.get().state {
+							Either::Left(
+								view! {
+									<span class="text-xl font-bold tracking-tight transition-all duration-300 ease-in-out delay-300 font-quicksand">
+										"Cebu Tours & Adventures"
+									</span>
+								},
+							)
+						} else {
+							Either::Right(())
+						}
+					}}
+				</a>
 
-                {MENUS
-                    .into_iter()
-                    .map(|val| {
-                        let val_temp = val.clone();
-                        view! {
-                            <a
-                                href=format!("{}", val_temp.clone().1.to_link())
-                                class="btn btn-ghost btn-soft"
-                            >
-                                <div class="w-42 mx-auto flex items-center gap-2">
-                                    <Icon
-                                        icon=val.clone().0
-                                        attr:class=move || {
-                                            format!(
-                                                "h-6 w-6 {}",
-                                                if !menu_state.get().state { "mx-auto" } else { "" },
-                                            )
-                                        }
-                                    />
-                                    {move || {
-                                        if menu_state.get().state {
-                                            Either::Left(
-                                                view! { <span>{val.clone().1.to_string()}</span> },
-                                            )
-                                        } else {
-                                            Either::Right(())
-                                        }
-                                    }}
-                                </div>
-                            </a>
-                        }
-                            .into_any()
-                    })
-                    .collect_view()}
-            </div>
-        </aside>
-    }
+				<div class="absolute top-3 -right-7">
+					<button
+						class="btn btn-ghost btn-circle"
+						on:click=move |_| {
+							let mut curr = menu_state.get();
+							if curr.state {
+								view_margin.update(|val| *val = String::from("ml-24"));
+								curr.class = String::from("w-24");
+								curr.state = false;
+							} else {
+								view_margin.update(|val| *val = String::from("ml-64"));
+								curr.class = String::from("w-64");
+								curr.state = true;
+							}
+							menu_state.set(curr);
+						}
+					>
+						{move || {
+							if !menu_state.get().state {
+								Either::Left(
+									view! {
+										<Icon icon=CARET_DOUBLE_RIGHT attr:class="h-6 w-6" />
+									},
+								)
+							} else {
+								Either::Right(
+									view! {
+										<Icon icon=CARET_DOUBLE_LEFT attr:class="h-6 w-6" />
+									},
+								)
+							}
+						}}
+					</button>
+				</div>
+			</div>
+
+			<div class="flex flex-col w-full">
+				{MENUS
+					.into_iter()
+					.map(|val| {
+						let val_temp = val.clone();
+						view! {
+							<a
+								href=format!("{}", val_temp.clone().1.to_link())
+								class="flex gap-2 items-center py-2.5 px-3 menu-active-hovered"
+							>
+								<div class="flex gap-2 items-center mx-auto w-42">
+									<Icon
+										icon=val.clone().0
+										attr:class=move || {
+											format!(
+												"h-6 w-6 {}",
+												if !menu_state.get().state { "mx-auto" } else { "" },
+											)
+										}
+									/>
+									{move || {
+										if menu_state.get().state {
+											Either::Left(
+												view! { <span>{val.clone().1.to_string()}</span> },
+											)
+										} else {
+											Either::Right(())
+										}
+									}}
+								</div>
+							</a>
+						}
+							.into_any()
+					})
+					.collect_view()} <div class="my-auto"></div>
+				<div class="p-3 w-full">
+					<a
+						href="#"
+						class="flex gap-2 items-center w-full btn btn-primary"
+					>
+						<Icon icon=SIGN_OUT attr:class="h-5 w-5" />
+						{move || {
+							if menu_state.get().state {
+								Either::Left(
+									view! {
+										<span class="transition-all duration-300 ease-in delay-400">
+											"Log Out"
+										</span>
+									},
+								)
+							} else {
+								Either::Right(())
+							}
+						}}
+					</a>
+				</div>
+			</div>
+		</aside>
+	}
     .into_any()
 }
 
