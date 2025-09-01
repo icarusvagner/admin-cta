@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@tailwindcss/cli": "^4.1.12",
+    "@tauri-apps/plugin-http": "^2.5.2",
     "daisyui": "^5.0.50",
     "tailwindcss": "^4.1.12"
   }

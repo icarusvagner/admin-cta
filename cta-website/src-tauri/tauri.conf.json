@@ -5,7 +5,7 @@
   "identifier": "com.tauri.dev",
   "build": {
     "frontendDist": "./dist",
-    "devUrl": "http://127.0.0.1:1350",
+    "devUrl": "http://localhost:1350",
     "beforeDevCommand": "trunk serve",
     "beforeBuildCommand": "trunk build --release"
   },

@@ -2,19 +2,7 @@ use leptos::{either::Either, prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 use phosphor_leptos::{Icon, GEAR, MAGNIFYING_GLASS, SIGN_OUT, USER};
 
-use crate::{components::themes::ThemeSwitcher, context_provider::ConfigProvider, error::{Error, Result}, server::auth::api_logout_req, types::request_types::{LogoffPayload, LogoffReturn}};
-
-async fn send_logoff_api(logoff: bool) -> Result<LogoffReturn> {
-	let data = LogoffPayload { logoff };
-
-	match api_logout_req(data).await {
-	    Ok(res) => Ok(res),
-	    Err(ex) => {
-	                leptos::logging::log!("{}", ex.to_string());
-	                Err(Error::Network(ex.to_string()))
-	    }
-	} 
-}
+use crate::{components::{send_logoff_api, themes::ThemeSwitcher}, context_provider::ConfigProvider};
 
 #[component]
 pub fn NavbarMenu() -> AnyView {

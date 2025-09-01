@@ -16,7 +16,7 @@
   }
 
   .menu-active-hovered {
-    @apply hover:text-primary relative;
+    @apply hover:text-primary relative
   }
 }
 
