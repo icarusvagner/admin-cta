@@ -1,8 +1,7 @@
-use crate::model::modql_utils::time_to_sea_value;
 use lib_utils::time::Rfc3339;
 use modql::{
     field::Fields,
-    filter::{FilterNodes, OpValsInt64, OpValsString, OpValsValue},
+    filter::{FilterNodes, OpValsInt64, OpValsString},
 };
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;

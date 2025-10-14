@@ -25,6 +25,7 @@ pub enum Error {
     },
     LoginFailPwdNotMatching {
         user_id: i64,
+        message: String,
     },
 
     // --- For package

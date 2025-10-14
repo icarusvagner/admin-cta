@@ -44,7 +44,10 @@ pub async fn api_login_handler(
         pwd,
     )
     .await
-    .map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;
+    .map_err(|_| Error::LoginFailPwdNotMatching {
+        user_id,
+        message: String::from("Password does not match our records"),
+    })?;
 
     // -- Update password scheme if needed
     if let SchemeStatus::Outdated = scheme_status {
