@@ -33,6 +33,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # --- Others
 uuid = { workspace = true }
+tower = { version = "0.5.2", features = ["limit"] }
 
 [dev-dependencies]
 httpc-test = "0.1"

@@ -18,7 +18,7 @@ use lib_web::{
 use serde_json::{json, Value};
 use tower_cookies::CookieManagerLayer;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
-use tracing::info;
+use tracing::{info, Level};
 use tracing_subscriber::EnvFilter;
 use web::{routes_email, routes_login};
 
@@ -83,6 +83,7 @@ async fn main() -> Result<()> {
         .layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolver))
         .layer(CookieManagerLayer::new())
         .layer(middleware::from_fn(mw_req_stamp_resolver))
+        .layer(TraceLayer::new_for_http())
         .fallback_service(route_static::serve_dir(&web_config().WEB_FOLDER));
 
     let listener = tokio::net::TcpListener::bind(&web_config().SERVICE_URL)
