@@ -13,7 +13,7 @@ pub async fn api_create_location(data: CreateLocationPayload) -> Result<Value, E
         }
     });
 
-    request_post::<Value, Value>("/rpc".into(), rpc_data).await
+    request_post::<Value, Value>("/rpc/v1".into(), rpc_data).await
 }
 
 pub async fn api_get_location_by_id(id: i64) -> Result<LocationReturn, Error> {
@@ -26,7 +26,7 @@ pub async fn api_get_location_by_id(id: i64) -> Result<LocationReturn, Error> {
         }
     });
 
-    request_post::<Value, LocationReturn>("/rpc".into(), rpc_data).await
+    request_post::<Value, LocationReturn>("/rpc/v1".into(), rpc_data).await
 }
 
 pub async fn api_get_locations() -> Result<ListLocationReturn, Error> {
@@ -37,7 +37,7 @@ pub async fn api_get_locations() -> Result<ListLocationReturn, Error> {
         "params": { }
     });
 
-    request_post::<Value, ListLocationReturn>("/rpc".into(), rpc_data).await
+    request_post::<Value, ListLocationReturn>("/rpc/v1".into(), rpc_data).await
 }
 
 pub async fn api_count_locations() -> Result<CountLocationReturn, Error> {
@@ -48,7 +48,7 @@ pub async fn api_count_locations() -> Result<CountLocationReturn, Error> {
         "params": { }
     });
 
-    request_post::<Value, CountLocationReturn>("/rpc".into(), rpc_data).await
+    request_post::<Value, CountLocationReturn>("/rpc/v1".into(), rpc_data).await
 }
 
 pub async fn api_remove_location(id: i64) -> Result<Value, Error> {
@@ -61,5 +61,5 @@ pub async fn api_remove_location(id: i64) -> Result<Value, Error> {
         }
     });
 
-    request_post::<Value, Value>("/rpc".into(), rpc_data).await
+    request_post::<Value, Value>("/rpc/v1".into(), rpc_data).await
 }

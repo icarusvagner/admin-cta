@@ -1,5 +1,6 @@
 use derive_more::From;
 use lib_core::model;
+use tower_governor::GovernorError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -8,6 +9,8 @@ pub enum Error {
     // -- Modules
     #[from]
     Model(model::Error),
+    #[from]
+    GovenorError(GovernorError),
 }
 
 // region:    --- Error Boilerplate

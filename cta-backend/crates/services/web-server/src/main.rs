@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::http::HeaderValue;
 use axum::{
     http::{
@@ -17,8 +19,10 @@ use lib_web::{
 };
 use serde_json::{json, Value};
 use tower_cookies::CookieManagerLayer;
+use tower_governor::governor::GovernorConfigBuilder;
+use tower_governor::GovernorLayer;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
-use tracing::{info, Level};
+use tracing::info;
 use tracing_subscriber::EnvFilter;
 use web::{routes_email, routes_login};
 
@@ -40,6 +44,22 @@ async fn main() -> Result<()> {
         .init();
 
     let mm = ModelManager::new().await?;
+
+    let gov_conf = GovernorConfigBuilder::default()
+        .per_second(3)
+        .burst_size(5)
+        .use_headers()
+        .finish()
+        .unwrap();
+
+    let gov_limiter = gov_conf.limiter().clone();
+
+    // a separate background tast to clean up
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(60));
+        tracing::info!("Rate limiting storage size: {}", gov_limiter.len());
+        gov_limiter.retain_recent();
+    });
 
     let cors_layer = CorsLayer::new()
         .allow_origin([
@@ -84,6 +104,7 @@ async fn main() -> Result<()> {
         .layer(CookieManagerLayer::new())
         .layer(middleware::from_fn(mw_req_stamp_resolver))
         .layer(TraceLayer::new_for_http())
+        .layer(GovernorLayer::new(gov_conf))
         .fallback_service(route_static::serve_dir(&web_config().WEB_FOLDER));
 
     let listener = tokio::net::TcpListener::bind(&web_config().SERVICE_URL)

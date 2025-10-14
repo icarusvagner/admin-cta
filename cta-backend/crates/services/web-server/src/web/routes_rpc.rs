@@ -13,6 +13,6 @@ pub fn routes(mm: ModelManager) -> Router {
 
     // Build the Axum handler for `/rpc`
     Router::new()
-        .route("/rpc", post(handlers_rpc::rpc_axum_handler))
+        .route("/rpc/v1", post(handlers_rpc::rpc_axum_handler))
         .with_state(rpc_router)
 }
