@@ -1,8 +1,7 @@
 use std::fmt::Display;
 
-use leptos::{either::Either, prelude::*, reactive::spawn_local, html, ev, web_sys::*, wasm_bindgen::*};
+use leptos::{either::Either, prelude::*, reactive::spawn_local};
 use leptos_router::hooks::{use_location, use_navigate};
-use leptos_use::use_event_listener;
 use phosphor_leptos::{
     Icon, IconData, CARET_DOUBLE_LEFT, CARET_DOUBLE_RIGHT, CLIPBOARD_TEXT, HOUSE, MAP_PIN_AREA,
     PACKAGE, SIGN_OUT, TREASURE_CHEST,
@@ -22,35 +21,34 @@ pub fn SidebarMenu(#[prop(into)] view_margin: RwSignal<String>) -> AnyView {
         class: "w-64".into(),
         state: true,
     });
-	let result_err = RwSignal::new(String::new());
-	let navigate = use_navigate();
-	let mut context_config = ConfigProvider::expect_context();
-	let btn_state = RwSignal::new(false);
-	let path = use_location().pathname;
+    let result_err = RwSignal::new(String::new());
+    let navigate = use_navigate();
+    let context_config = ConfigProvider::expect_context();
+    let btn_state = RwSignal::new(false);
+    let path = use_location().pathname;
 
-	let ext_class = RwSignal::new(String::new());
+    let ext_class = RwSignal::new(String::new());
 
-	let log_out = move |_| {
-		let nav = navigate.clone();
-		btn_state.set(true);
-		
-		spawn_local(async move {
-			match send_logoff_api(true).await {
-				Ok(res) => {
-					if res.result.logged_off {
-						btn_state.set(false);
-						context_config.logout();
-						nav("/login", Default::default());
-					}
-				},
-				Err(ex) => {
-					result_err.set(ex.to_string());
-					btn_state.set(false);
-				}
-			}
-		});
-	};
+    let log_out = move |_| {
+        let nav = navigate.clone();
+        btn_state.set(true);
 
+        spawn_local(async move {
+            match send_logoff_api(true).await {
+                Ok(res) => {
+                    if res.result.logged_off {
+                        btn_state.set(false);
+                        context_config.logoff();
+                        nav("/login", Default::default());
+                    }
+                }
+                Err(ex) => {
+                    result_err.set(ex.to_string());
+                    btn_state.set(false);
+                }
+            }
+        });
+    };
 
     view! {
 		<aside class=move || {

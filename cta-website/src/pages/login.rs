@@ -1,7 +1,15 @@
 use leptos::{either::Either, ev, prelude::*, task::spawn_local};
 use leptos_router::{hooks::use_navigate, location::State};
 
-use crate::{context_provider::ConfigProvider, error::{Error, Result}, server::auth::api_login_req, types::request_types::{LoginPayload, LoginReturn}};
+use crate::{
+    context_provider::ConfigProvider,
+    error::{Error, Result},
+    server::auth::api_login_req,
+    types::{
+        request_types::{LoginPayload, LoginReturn},
+        user::CurrentUserToken,
+    },
+};
 
 #[derive(Default, Clone, Debug)]
 struct LoginField {
@@ -15,9 +23,7 @@ async fn send_login_api(username: String, pwd: String) -> Result<LoginReturn> {
 
         match api_login_req(data).await {
             Ok(res) => Ok(res),
-            Err(ex) => {
-                Err(Error::Forbidden(ex.to_string()))
-            }
+            Err(ex) => Err(Error::Forbidden(ex.to_string())),
         }
     } else {
         Err(Error::EmptyInputs)?
@@ -28,7 +34,7 @@ async fn send_login_api(username: String, pwd: String) -> Result<LoginReturn> {
 pub fn LoginPage() -> AnyView {
     let form_input = RwSignal::new(LoginField::default());
     let result_err = RwSignal::new(String::new());
-    let mut config_context = ConfigProvider::expect_context();
+    let config_context = ConfigProvider::expect_context();
     let navigate = use_navigate();
     let btn_state = RwSignal::new(false);
 
@@ -39,25 +45,39 @@ pub fn LoginPage() -> AnyView {
         btn_state.set(true);
 
         if !form_data().username.is_empty() && !form_data().password.is_empty() {
-	        spawn_local(async move {
-	            match send_login_api(form_data().username, form_data().password).await {
-	                Ok(res) => {
-	                    if res.result.success {
-				            btn_state.set(false);
-	                    	config_context.is_logged_in();
-	                    	nav("/", leptos_router::NavigateOptions { resolve: true, replace: true, scroll: true, state: State::default() });
-	                    } else {
-	                        result_err.set("Invalid username or password".to_string());
-				            btn_state.set(false);
-	                    }
-	                },
-	                Err(ex) => {
-	                    leptos::logging::log!("Something went wrong: {}", ex.to_string());
-	                    result_err.set(ex.to_string());
-			            btn_state.set(false);
-	                }
-	            }
-	        });
+            spawn_local(async move {
+                match send_login_api(form_data().username, form_data().password).await {
+                    Ok(res) => {
+                        if res.result.success {
+                            btn_state.set(false);
+
+                            let tokens = CurrentUserToken::new(
+                                res.result.access_token.clone(),
+                                res.result.refresh_token.clone(),
+                            );
+
+                            config_context.login(tokens);
+                            nav(
+                                "/",
+                                leptos_router::NavigateOptions {
+                                    resolve: true,
+                                    replace: true,
+                                    scroll: true,
+                                    state: State::default(),
+                                },
+                            );
+                        } else {
+                            result_err.set("Invalid username or password".to_string());
+                            btn_state.set(false);
+                        }
+                    }
+                    Err(ex) => {
+                        leptos::logging::log!("Something went wrong: {}", ex.to_string());
+                        result_err.set(ex.to_string());
+                        btn_state.set(false);
+                    }
+                }
+            });
         } else {
             result_err.set("Invalid inputs".to_string());
             btn_state.set(false);

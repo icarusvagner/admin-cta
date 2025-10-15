@@ -14,6 +14,8 @@ pub struct LoginReturn {
 #[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Clone, Default)]
 pub struct ResultReturn {
     pub success: bool,
+    pub access_token: String,
+    pub refresh_token: String,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Clone, Default)]
@@ -50,4 +52,3 @@ pub struct CreateLocationPayload {
     pub category: String,
     pub description: String,
 }
-

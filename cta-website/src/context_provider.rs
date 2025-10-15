@@ -6,46 +6,50 @@ use leptos::{
 use leptos_meta::*;
 use leptos_use::storage::use_local_storage;
 
-use crate::types::theme::Themes;
+use crate::{
+    types::{theme::Themes, user::CurrentUserToken},
+    utils::api::set_token,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub struct ConfigProvider {
     pub theme: RwSignal<String>,
-    logged_in: RwSignal<bool>,
+    pub access_token: RwSignal<Option<String>>,
+    pub refresh_token: RwSignal<Option<String>>,
 }
 
 impl ConfigProvider {
     pub fn new() -> Self {
         let (stored_theme, _, _) = use_local_storage::<String, JsonSerdeCodec>("theme");
-        let (logged_in, _, _) = use_local_storage::<bool, JsonSerdeCodec>("logged-in");
 
         Self {
             theme: RwSignal::new(stored_theme.get()),
-            logged_in: RwSignal::new(logged_in.get()),
+            access_token: RwSignal::new(None),
+            refresh_token: RwSignal::new(None),
         }
+    }
+
+    pub fn login(&self, value: CurrentUserToken) {
+        set_token("access_token", Some(value.access_token.clone()));
+        set_token("refresh_token", Some(value.refresh_token.clone()));
+
+        self.access_token.set(Some(value.access_token));
+        self.refresh_token.set(Some(value.refresh_token));
+    }
+
+    pub fn logoff(&self) {
+        set_token("access_token", None);
+        set_token("refresh_token", None);
+        self.access_token.set(None);
+        self.refresh_token.set(None);
     }
 
     pub fn expect_context() -> Self {
         expect_context()
     }
 
-    pub fn is_logged_in(&mut self) {
-        let (login, set_login, _) = use_local_storage::<bool, FromToStringCodec>("logged-in");
-        set_login.set(true);
-
-        self.logged_in.update(|va| *va = login.get());
-    }
-
-    pub fn logout(&mut self) {
-        let (login, set_login, reset) = use_local_storage::<bool, FromToStringCodec>("logged-in");
-        set_login.set(false);
-        reset();
-
-        self.logged_in.update(|va| *va = login.get());
-    }
-
     pub fn logged_in(&self) -> bool {
-        self.logged_in.get()
+        self.access_token.get().is_some() && self.refresh_token.get().is_some()
     }
 
     pub fn update_theme(&self, theme: Themes) {

@@ -2,35 +2,38 @@ use leptos::{either::Either, prelude::*, reactive::spawn_local};
 use leptos_router::hooks::use_navigate;
 use phosphor_leptos::{Icon, GEAR, MAGNIFYING_GLASS, SIGN_OUT, USER};
 
-use crate::{components::{send_logoff_api, themes::ThemeSwitcher}, context_provider::ConfigProvider};
+use crate::{
+    components::{send_logoff_api, themes::ThemeSwitcher},
+    context_provider::ConfigProvider,
+};
 
 #[component]
 pub fn NavbarMenu() -> AnyView {
-	let result_err = RwSignal::new(String::new());
-	let navigate = use_navigate();
-	let mut context_config = ConfigProvider::expect_context();
-	let btn_state = RwSignal::new(false);
+    let result_err = RwSignal::new(String::new());
+    let navigate = use_navigate();
+    let context_config = ConfigProvider::expect_context();
+    let btn_state = RwSignal::new(false);
 
-	let log_out = move |_| {
-		let nav = navigate.clone();
-		btn_state.set(true);
-		
-		spawn_local(async move {
-			match send_logoff_api(true).await {
-				Ok(res) => {
-					if res.result.logged_off {
-						btn_state.set(false);
-						context_config.logout();
-						nav("/login", Default::default());
-					}
-				},
-				Err(ex) => {
-					result_err.set(ex.to_string());
-					btn_state.set(false);
-				}
-			}
-		});
-	};
+    let log_out = move |_| {
+        let nav = navigate.clone();
+        btn_state.set(true);
+
+        spawn_local(async move {
+            match send_logoff_api(true).await {
+                Ok(res) => {
+                    if res.result.logged_off {
+                        btn_state.set(false);
+                        context_config.logoff();
+                        nav("/login", Default::default());
+                    }
+                }
+                Err(ex) => {
+                    result_err.set(ex.to_string());
+                    btn_state.set(false);
+                }
+            }
+        });
+    };
 
     view! {
 		<div class="shadow-sm navbar bg-base-300">

@@ -3,6 +3,7 @@ use crate::utils::token;
 use axum::extract::State;
 use axum::Json;
 use lib_auth::pass::{self, ContentToHash, SchemeStatus};
+use lib_auth::token::generate_web_token;
 use lib_core::ctx::Ctx;
 use lib_core::model::admin::{AdminBmc, AdminForLogin};
 use lib_core::model::ModelManager;
@@ -56,12 +57,15 @@ pub async fn api_login_handler(
     }
 
     // -- Set web token.
-    token::set_token_cookie(&cookies, &user.uname.clone(), user.token_salt)?;
+    // token::set_token_cookie(&cookies, &user.uname.clone(), user.token_salt)?;
+    let token = generate_web_token(&user.uname.clone(), user.token_salt)?;
 
     // Create the success body.
     let body = Json(json!({
         "result": {
-            "success": true
+            "success": true,
+            "access_token": token.to_string(),
+            "refresh_token": token.to_string()
         }
     }));
 
