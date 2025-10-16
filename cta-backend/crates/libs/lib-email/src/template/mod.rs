@@ -58,28 +58,28 @@ pub fn template_01(email_data: EmailTemplate01) -> String {
                     color: #007BFF;
                     text-decoration: none;
                 }"
-    }
-    body {
-        div class="container" {
-            div class="header" {
-                h1 { "Contact Us Message" }
-            }
-            div class="content" {
-                p {
-                    strong { "Fullname: " (email_data.fullname) }
-                }
-                p {
-                    strong { "Email: " (email_data.email_add) }
-                }
-                p {
-                    strong { "Tour Type: " (email_data.tour_type) }
-                }
-                p {
-                    strong { "Message: " (email_data.email_msg) }
-                }
             }
         }
-    }
+        body {
+            div class="container" {
+                div class="header" {
+                    h1 { "Contact Us Message" }
+                }
+                div class="content" {
+                    p {
+                        strong { "Fullname: " (email_data.fullname) }
+                    }
+                    p {
+                        strong { "Email: " (email_data.email_add) }
+                    }
+                    p {
+                        strong { "Tour Type: " (email_data.tour_type) }
+                    }
+                    p {
+                        strong { "Message: " (email_data.email_msg) }
+                    }
+                }
+            }
         }
     }
     .into_string()
