@@ -1,9 +1,10 @@
 use crate::error::{Error, Result};
+use crate::utils::token::{set_token_cookie, AUTH_TOKEN};
 use axum::body::Body;
 use axum::extract::{FromRequestParts, State};
 use axum::http::header::AUTHORIZATION;
 use axum::http::request::Parts;
-use axum::http::{self, Request};
+use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::Response;
 use lib_auth::token::{validate_web_token, Token};
@@ -11,6 +12,7 @@ use lib_core::ctx::{AuthUser, Ctx};
 use lib_core::model::admin::{AdminBmc, AdminForAuth};
 use lib_core::model::ModelManager;
 use serde::Serialize;
+use tower_cookies::{Cookie, Cookies};
 use tracing::debug;
 
 pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
@@ -28,17 +30,18 @@ pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -
 //            to get the appropriate information.
 pub async fn mw_ctx_resolver(
     State(mm): State<ModelManager>,
+    cookies: Cookies,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
     let mm = mm.clone();
     debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
-    let ctx_ext_result = ctx_resolve(mm, &req).await;
+    let ctx_ext_result = ctx_resolve(mm, &cookies).await;
 
-    // if ctx_ext_result.is_err() && !matches!(ctx_ext_result, Err(CtxExtError::TokenNotInCookie)) {
-    //     cookies.remove(Cookie::from(AUTH_TOKEN))
-    // }
+    if ctx_ext_result.is_err() && !matches!(ctx_ext_result, Err(CtxExtError::TokenNotInCookie)) {
+        cookies.remove(Cookie::from(AUTH_TOKEN))
+    }
 
     // Store the ctx_ext_result in the request extension
     // (for Ctx extractor).
@@ -47,26 +50,15 @@ pub async fn mw_ctx_resolver(
     next.run(req).await
 }
 
-async fn ctx_resolve(mm: ModelManager, req: &Request<Body>) -> CtxExtResult {
+async fn ctx_resolve(mm: ModelManager, cookies: &Cookies) -> CtxExtResult {
     // -- Get Token String
-    // let token = cookies
-    //     .get(AUTH_TOKEN)
-    //     .map(|c| c.value().to_string())
-    //     .ok_or(CtxExtError::TokenNotInCookie)?;
-    // -- Get token from header
-    let token = req
-        .headers()
-        .get(http::header::AUTHORIZATION)
-        .ok_or(CtxExtError::TokenNotInHeader)?;
-    let token_str = token.to_str().map_err(|_| CtxExtError::BadRequest)?;
+    let token = cookies
+        .get(AUTH_TOKEN)
+        .map(|c| c.value().to_string())
+        .ok_or(CtxExtError::TokenNotInCookie)?;
 
     // -- Parse Token
-    let token: Token = token_str
-        .strip_prefix("Bearer ")
-        .ok_or(CtxExtError::Unauthorized)?
-        .trim()
-        .parse()
-        .map_err(|_| CtxExtError::TokenWrongFormat)?;
+    let token: Token = token.parse().map_err(|_| CtxExtError::TokenWrongFormat)?;
 
     // -- Get UserForAuth
     let user: AdminForAuth = AdminBmc::first_by_uname(&Ctx::root_ctx(), &mm, &token.ident)
@@ -78,8 +70,8 @@ async fn ctx_resolve(mm: ModelManager, req: &Request<Body>) -> CtxExtResult {
     validate_web_token(&token, user.token_salt).map_err(|_| CtxExtError::FailValidate)?;
 
     // -- Update Token
-    // set_token_cookie(cookies, &user.uname, user.token_salt)
-    //     .map_err(|_| CtxExtError::CannotSetTokenCookie)?;
+    set_token_cookie(cookies, &user.uname, user.token_salt)
+        .map_err(|_| CtxExtError::CannotSetTokenCookie)?;
 
     // -- Create CtxExtResult
     Ctx::new(user.id)

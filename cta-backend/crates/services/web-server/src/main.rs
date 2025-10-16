@@ -81,7 +81,7 @@ async fn main() -> Result<()> {
         .layer(TraceLayer::new_for_http())
         .layer(middleware::map_response(mw_reponse_map))
         .layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolver))
-        // .layer(CookieManagerLayer::new())
+        .layer(CookieManagerLayer::new())
         .layer(middleware::from_fn(mw_req_stamp_resolver))
         .layer(TraceLayer::new_for_http())
         .fallback_service(route_static::serve_dir(&web_config().WEB_FOLDER));
