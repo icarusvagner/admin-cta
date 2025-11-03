@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@import "./themes.css";
+
+@plugin "daisyui" {
+   themes: gigalord --default, dark --prefersdark, cupcake, bumblebee, night, dracula, cmyk, sunset, gigalord, light;
+}
